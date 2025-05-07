@@ -1,0 +1,16 @@
+.status-connected {
+    color: green; 
+    font-weight: bold;
+}
+.status-disconnected { 
+   color: red; 
+   font-weight: bold; 
+}         
+.login-btn { 
+   width: 100%; 
+   text-align: left; 
+   border: 1px solid #ccc; 
+   padding: 8px; 
+   border-radius: 5px; 
+   background: white; 
+}

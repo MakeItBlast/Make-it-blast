@@ -1,0 +1,35 @@
+.carousel-item img {
+    height: 650px;
+    object-fit: cover;
+}
+.card {
+    border:none !important;
+    padding:40px !important;
+}
+.toggle-password {
+    cursor: pointer;
+}
+
+.log-frm{
+    margin:auto 50px;
+    padding:20px;
+}
+
+.toggle-password{
+    top:25% !important;
+}
+
+.sign a{
+    text-decoration: none !important;
+}
+
+@media (max-width: 768px) {
+    .carousel-item img {
+        height: 250px;
+        width:auto !important;
+    }
+
+    .carousel-inner{
+        margin: 0 auto !important;
+    }
+}

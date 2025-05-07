@@ -1,0 +1,143 @@
+.top {
+    display: flex;
+    padding: 50px;
+}
+
+.slider-container {
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+    overflow: hidden;
+    position: relative;
+}
+
+.slider {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+    min-width: 100%;
+}
+
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.prev,
+.next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    border-radius: 5px;
+    z-index: 10;
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
+}
+
+.prev:hover,
+.next:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+
+.log-in {
+    width: 50%;
+    padding: 0px 100px 0px 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.log {
+    width: 100%;
+    max-width: 500px;
+}
+
+.log>* {
+    margin-bottom: 10px !important;
+}
+
+
+.log input {
+    margin-top: 10px !important;
+}
+
+.log-in h2 {
+    margin-bottom: 10px;
+    font-weight: 500;
+    font-size: 35px;
+}
+
+.free {
+    margin-bottom: 10px;
+    font-weight: 500;
+    font-size: 35px;
+    text-transform: uppercase;
+}
+
+
+.input-group {
+    width: 100%;
+}
+
+.input-group label {
+    position: relative;
+    width: 100%;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+.btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.btn:hover {
+    background: #0056b3;
+}
+
+.tos {
+    text-decoration: none;
+    color: #05b1f2;
+}
+
+.policy {
+    text-decoration: none;
+    color: #05b1f2;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 45px;
+    cursor: pointer;
+}
