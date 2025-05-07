@@ -1,0 +1,29 @@
+.table th,
+.table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.highlight {
+    font-weight: bold;
+}
+
+.text-green {
+    color: green;
+}
+
+.text-red {
+    color: red;
+}
+
+.actions i {
+    cursor: pointer;
+    padding: 5px;
+}
+
+.tab-bg {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
