@@ -9,143 +9,6 @@ use App\Models\ContactImportData;
 
 use Illuminate\Support\Facades\Validator;
 
-// class TempelateController extends Controller
-// {
-//     //
-//     public function storeTempelate(Request $request){
-
-//         try {
-//             $validator = Validator::make($request->all(), [
-//                 'user_id' => 'required|integer|exists:users,id', // Ensures the user_id exists in the users table
-//                 'tempelate_structure' => 'required|string',
-//                 'tempelate_by' => 'required|string',
-//                 'temp_name' => 'required|string|max:255|unique:templetes,temp_name', // Ensures temp_name is unique in the templetes table
-//             ]);
-            
-
-//             if ($validator->fails()) {
-//                 return redirect()->back()->withErrors($validator)->withInput();
-//             }
-
-//             // Construct an associative array for insertion
-//             $newTempelate = [
-//                 'user_id' => $request->input('user_id'),
-//                 'tempelate_structure' => $request->input('tempelate_structure'),
-//                 'tempelate_by' => $request->input('tempelate_by'),    
-//                 'temp_name' => $request->input('temp_name'),                        
-//             ];
-
-           
-//             // Create a new record in the database
-//             $addNewTempelate = Tempelate::create($newTempelate);
-
-//             if($addNewTempelate){
-//                 return redirect()->back()->with('success', "Tempelate added successfully");
-//             }else{
-//                 return redirect()->back()->with('success', "Tempelate not added");
-//             }
-
-//         } catch (\Exception $e) {
-//             return redirect()->back()
-//                 ->withErrors(['error' => 'Some critical Error: ' . $e->getMessage()])
-//                 ->withInput();
-//         }
-//     }
-
-//     public function getTempelate(){
-
-//         $curr_userId = auth()->id();
-//         // Fetch all data from the Tempelate model
-//         $tempelateList = Tempelate::where('user_id',$curr_userId)->get();
-
-//         // Pass the data to the view
-//         return view('admin.pages.my-templates',compact('tempelateList'));
-//     }
-
-//     public function getTempelateStructure(Request $request) {
-//         try{
-//         // Validate the request
-//         $validator = Validator::make($request->all(), [
-//             'template' => 'required|integer|exists:tempelates,id', // Validate against correct table
-//         ]);
-    
-//         if ($validator->fails()) {
-//             return redirect()->back()->withErrors($validator)->withInput();
-//         }
-
-//         $curr_userId = auth()->id();
-//         // Fetch all data from the Tempelate model
-//         $tempelateList = Tempelate::where('user_id',$curr_userId)->get();
-    
-//         // Retrieve the template
-//         $getTempelateStructure = Tempelate::where('id', $request->template)->first();
-//         echo '<pre>';
-//         print_r($getTempelateStructure->temp_name);
-//         echo '</pre>';
-        
-//         return view('admin.pages.my-templates', compact('getTempelateStructure', 'tempelateList'));
-//      } catch (\Exception $e) {
-//         // Handle exceptions and return a proper error message
-//         return redirect()->back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
-//     }
-//     }
-    
-    
-//     public function storeResource(Request $request){
-//         try {
-//             // Validate incoming request data
-//             $validator = Validator::make($request->all(), [
-//                 'rsrc_type' => 'required|string|max:255', // Assuming rsrc_type is a required string with a max length of 255
-//                 'rsrc_name' => 'required|string|max:255', // Assuming rsrc_name is a required string with a max length of 255
-//                 'user_id'   => 'required|integer|exists:users,id', // Assuming user_id is a required integer and must exist in the users table
-//                 'blast_id'  => 'required|integer|exists:blasts,id', // Assuming blast_id is a required integer and must exist in the blasts table
-//             ]);
-            
-           
-//         if ($validator->fails()) {
-//             return redirect()->back()->withErrors($validator)->withInput();
-//         }
-
-//             // Construct an associative array for insertion
-//             $newResource = [
-//                 'rsrc_type' => $request->input('rsrc_type'),
-//                 'rsrc_name' => $request->input('rsrc_name'),
-//                 'user_id' => $request->input('user_id'), 
-//                 'blast_id' => $request->input('blast_id'),             
-//             ];
-
-           
-//             // Create a new record in the database
-//             $addNewResource = UserResource::create($newResource);
-
-//             if($addNewResource){
-//                 return redirect()->back()->with('success', "Resource added successfully"); 
-//             }else{
-//                 return redirect()->back()->with('success', "Resource not added");  
-//             }
-
-//         } catch (\Exception $e) {
-//             // Handle exceptions and return a proper error message
-//             return redirect()->back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
-//         }
-//     }
-
-//     public function getResource(){
-//         $curr_userId = auth()->id();
-
-//         $resource = UserResource::all();
-
-//         $tempelateList = Tempelate::where('user_id',$curr_userId)->get();
-    
-//         // Retrieve the template
-//         $getTempelateStructure = Tempelate::where('id', $request->template)->first();
-
-//         return view('admin.pages.my-templates', compact('getTempelateStructure', 'tempelateList','resource'));
-//     }
-
-// }
-
-
 
 // new data
 class TempelateController extends Controller
@@ -154,13 +17,19 @@ class TempelateController extends Controller
     public function getTempelate()
     {
         $curr_userId = auth()->id();
+        $links = UserResource::where('user_id', $curr_userId)->where('rsrc_type', 'link')->get();
+
+        $medias = UserResource::where('user_id', $curr_userId)->where('rsrc_type', 'image')->get();
+
         $tempelateList = Tempelate::where('user_id', $curr_userId)->get();
-        return view('admin.pages.my-templates', compact('tempelateList'));
+        
+        return view('admin.pages.my-templates', compact('tempelateList','links', 'medias'));
     }
 
     // Get Template Structure and Populate Editor
     public function getTempelateStructure(Request $request)
     {
+
         try {
             $validator = Validator::make($request->all(), [
                 'template' => 'required|integer|exists:tempelates,id',
@@ -174,92 +43,145 @@ class TempelateController extends Controller
             $tempelateList = Tempelate::where('user_id', $curr_userId)->get();
             $getTempelateStructure = Tempelate::where('id', $request->template)->first();
 
-            // Return view with template structure populated
-            return view('admin.pages.my-templates', compact('getTempelateStructure', 'tempelateList'));
+            $links = UserResource::where('user_id', $curr_userId)->where('rsrc_type', 'link')->get();
+
+            $medias = UserResource::where('user_id', $curr_userId)->where('rsrc_type', 'image')->get();
+
+            return view('admin.pages.my-templates', compact('getTempelateStructure', 'tempelateList', 'links', 'medias'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
         }
     }
+
+
 
     // Store New Template
     public function storeTempelate(Request $request)
     {
-    try {
-        $validator = Validator::make($request->all(), [
-            'template_structure' => 'required|string',
-            'tempelate_by' => 'required|string',
-            'temp_name' => 'required|string',
-        ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $curr_userId = auth()->id();
-        if (!$curr_userId) {
-            return redirect()->back()->withErrors(['error' => 'User not authenticated']);
-        }
-
-        $newTempelate = [
-            'user_id' => $curr_userId,
-            'template_structure' => $request->input('template_structure'),
-            'tempelate_by' => $request->input('tempelate_by'),
-            'temp_name' => $request->input('temp_name'),
-        ];
-
-        $addNewTempelate = Tempelate::create($newTempelate);
-
-        if ($addNewTempelate) {
-            return redirect()->back()->with('success', 'Template added successfully');
-        } else {
-            return redirect()->back()->with('error', 'Template not added');
-        }
-    } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
-    }
-}
-
-
-    public function updateTempelatStructure(Request $request)
-    {
-        print_r($request->template_id);
-       
         try {
             $validator = Validator::make($request->all(), [
-                'template_id' => 'required|integer',
                 'template_structure' => 'required|string',
                 'tempelate_by' => 'required|string',
-                'temp_name' => 'required|string|max:255',
+                'temp_name' => 'required|string',
             ]);
-    
+
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
-    
+
             $curr_userId = auth()->id();
-            $temp_id = $request->input('template_id');
-    
+            // if (!$curr_userId) {
+            //     return redirect()->back()->withErrors(['error' => 'User not authenticated']);
+            // }
+
             $newTempelate = [
                 'user_id' => $curr_userId,
                 'template_structure' => $request->input('template_structure'),
-                'tempelate_by' => $request->input('tempelate_by'),
+                'template_by' => $request->input('tempelate_by'),
                 'temp_name' => $request->input('temp_name'),
             ];
-    
-            $updNewTempelate = Tempelate::where('id', $temp_id)
-                ->where('user_id', $curr_userId)
-                ->update($newTempelate);
-    
-            if ($updNewTempelate > 0) {
-                return redirect()->back()->with('success', 'Template updated successfully');
+
+            $addNewTempelate = Tempelate::create($newTempelate);
+
+            if ($addNewTempelate) {
+                return redirect()->back()->with('success', 'Template added successfully');
             } else {
-                return redirect()->back()->with('error', 'No changes made to the template');
+                return redirect()->back()->with('error', 'Template not added');
             }
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
         }
     }
-    
+
+    public function updateTempelatStructure(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'template_id' => 'required|integer',
+                'template_structure' => 'required|string',
+                'temp_name' => 'required|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                //return redirect()->back()->withErrors($validator)->withInput();
+            }
+
+            $curr_userId = auth()->id();
+            $temp_id = $request->input('template_id');
+
+            $updTempelate = [
+                'user_id' => $curr_userId,
+                'template_structure' => $request->input('template_structure'),
+                'template_by' => 'user',
+                'temp_name' => $request->input('temp_name'),
+            ];
+
+            $updNewTempelate = Tempelate::where('id', $temp_id)
+                ->where('user_id', $curr_userId)
+                ->update($updTempelate);
+            print_r($updNewTempelate);
+
+
+            return redirect()->route('my-template')->with('success', 'Template updated successfully');
+            if ($updNewTempelate > 0) {
+                //return redirect()->route('admin.pages.update-templates')->with('success', 'Template updated successfully');
+            } else {
+                //return redirect()->route('admin.pages.update-templates')->with('error', 'No changes made to the template');
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
+        }
+    }
+
+    // **Delete Template**
+    //working for del
+    //     public function deleteTempelate($id)
+    // {
+    //     try {
+    //         $curr_userId = auth()->id();
+
+    //         // Ensure the user owns the template before deleting
+    //         $deleted = Tempelate::where('id', $id)
+    //             ->where('user_id', $curr_userId)
+    //             ->delete();
+
+    //         return redirect()->back()->with(
+    //             $deleted ? 'success' : 'error', 
+    //             $deleted ? 'Template deleted successfully' : 'Failed to delete the template'
+    //         );
+    //     } catch (\Exception $e) {
+    //         return redirect()->back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
+    //     }
+    // }
+
+    // working for status
+    public function deleteTempelate($id)
+    {
+        try {
+            $curr_userId = auth()->id();
+
+            // Find the template owned by the user
+            $template = Tempelate::where('id', $id)
+                ->where('user_id', $curr_userId)
+                ->first();
+
+            if (!$template) {
+                return redirect()->back()->with('error', 'Template not found or access denied.');
+            }
+
+            // Toggle status between 'Active' and 'Inactive'
+            $template->status = ($template->status === 'active') ? 'inactive' : 'active';
+            $template->save();
+
+            return redirect()->back()->with('success', 'Template status updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()]);
+        }
+    }
+
+
+
 
     // Fetch User Resources (Optional)
     // public function getResource()
@@ -272,17 +194,182 @@ class TempelateController extends Controller
 
     public function getResource()
     {
-                $curr_userId = auth()->id();
+        $curr_userId = auth()->id();
 
-                //$userInfoColumns = ContactImportData::where('user_id',$curr_userId)->get();
-        
-                $resource = UserResource::where('user_id',$curr_userId)->get();
-        
-                $tempelateList = Tempelate::where('user_id',$curr_userId)->get();
-            
-                // Retrieve the template
-                $getTempelateStructure = Tempelate::where('id', $request->template)->first();
-        
-                return view('admin.pages.my-templates', compact('getTempelateStructure', 'tempelateList','resource','userInfoColumns'));
+        //$userInfoColumns = ContactImportData::where('user_id',$curr_userId)->get();
+
+        //$resource = UserResource::where('user_id',$curr_userId)->get();
+
+        $tempelateList = Tempelate::where('user_id', $curr_userId)->get();
+
+        $links = UserResource::where('user_id', $curr_userId)->where('rsrc_type', 'link')->get();
+
+        $medias = UserResource::where('user_id', $curr_userId)->where('rsrc_type', 'image')->get();
+
+        // Retrieve the template
+        $getTempelateStructure = Tempelate::where('id', $request->template)->first();
+
+        return view('admin.pages.my-templates', compact('getTempelateStructure', 'tempelateList', 'userInfoColumns', 'links', 'medias'));
+    }
+
+    public function storeResourceLink(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'url_text' => 'required|string',
+                'url_value' => 'required|url',
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => $validator->errors(),
+                ], 200);
             }
+    
+            $newLink = UserResource::create([
+                'user_id'    => auth()->id(),
+                'rsrc_type'  => 'link',
+                'rsrc_name'  => $request->input('url_text'),
+                'rsrc_value' => $request->input('url_value'),
+            ]);
+    
+            if ($newLink) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Link added successfully.',
+                    'data' => $newLink
+                ]);
+            }
+    
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to add the link.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong.',
+                'details' => $e->getMessage()
+            ], 200);
+        }
+    }
+
+
+
+
+    public function storeResourceMedia(Request $request)
+    {
+
+  
+        try {
+            // 1. Validate input
+            $validator = Validator::make($request->all(), [
+                'media_text'  => 'required|string',
+                'media_file'  => 'required|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv|max:10240', // 10MB max
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => $validator->errors(),
+                ], 200);
+            }
+    
+            // 2. Handle file upload
+            if ($request->hasFile('media_file')) {
+                $file = $request->file('media_file');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+    
+                // Determine file type (image or video)
+                $mimeType = $file->getMimeType();
+                $isImage = str_starts_with($mimeType, 'image');
+                $isVideo = str_starts_with($mimeType, 'video');
+    
+                $folder = $isImage ? 'user_resource/images' : ($isVideo ? 'user_resource/videos' : null);
+    
+                if (!$folder) {
+                    return response()->json([
+                        'status'  => false,
+                        'message' => 'Unsupported media type.'
+                    ], 200);
+                }
+    
+                // Save file directly to the public folder
+                $file->move(public_path($folder), $fileName);
+            } else {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'No media file uploaded.'
+                ], 200);
+            }
+    
+            // 3. Save to DB
+            $newResource = UserResource::create([
+                'user_id'    => auth()->id(),
+                'rsrc_type'  => $isImage ? 'image' : 'video',
+                'rsrc_name'  => $request->input('media_text'),
+                'rsrc_value' => $folder . '/' . $fileName, // path relative to public/
+            ]);
+    
+            if ($newResource) {
+                return response()->json([
+                    'status'  => true,
+                    'message' => 'Media uploaded successfully.',
+                    'data'    => $newResource
+                ]);
+            }
+    
+            return response()->json([
+                'status'  => false,
+                'message' => 'Failed to upload media.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Something went wrong.',
+                'details' => $e->getMessage()
+            ], 200);
+        }
+    }
+
+    //delete media
+
+    public function deleteResource(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'delId' => 'required|string|exists:user_resources,id',
+            ]);
+    
+            if ($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+    
+            $resource = UserResource::where('id', $request->delId)
+            ->where('user_id', auth()->id())
+            ->first();
+
+            if ($resource) {
+               $del_success =  $resource->delete();
+
+                if($del_success){
+                    return redirect()->back()->with('success', 'Resource deleted successfully.');
+
+                }else{
+                    return redirect()->back()->with('error', 'Resource not Deleted.'); 
+                }
+
+            } else {
+                return redirect()->back()->with('error', 'Resource not found or already deleted.');
+            }
+    
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
+    }
+    
+    
 }
