@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('blast_answers', function (Blueprint $table) {
             $table->id(); // Primary Key 
             $table->text('answer'); // Answer text
-           
+            $table->unsignedBigInteger('question_id'); // Foreign key reference to contacts table
             $table->unsignedBigInteger('contact_id'); // Foreign key reference to contacts table
             $table->timestamps(); // created_at & updated_at
             $table->softDeletes(); // Adds deleted_at for soft delete
@@ -24,6 +24,7 @@ return new class extends Migration
             // Foreign Key Constraints
     
             $table->foreign('contact_id')->references('id')->on('contact_import_data')->onDelete('cascade');
+            $table->foreign('question_id')->references('id')->on('blast_questions')->onDelete('cascade');
         });
     }
 

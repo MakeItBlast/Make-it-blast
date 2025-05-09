@@ -18,9 +18,6 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id'); 
             $table->unique('user_id');
             $table->text('address')->nullable();
-            $table->string('phno', 15)->nullable(); 
-            $table->string('first_name')->nullable();
-            $table->string('last_name')->nullable();
             $table->string('billing_email')->nullable();
             $table->string('zipcode', 10)->nullable();
             $table->string('city')->nullable();
@@ -28,6 +25,7 @@ return new class extends Migration
             $table->string('country')->nullable();
             $table->string('company_name')->nullable();
             $table->string('avatar')->nullable(); 
+            $table->enum('status', ['active', 'inactive'])->nullable();
             $table->timestamps();
             $table->softDeletes();   
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

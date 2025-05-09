@@ -20,7 +20,8 @@ return new class extends Migration
             $table->enum('status',['active','inactive'])->default('active'); // Active/Inactive Status
             $table->timestamps(); // created_at & updated_at
             $table->softDeletes(); // Adds deleted_at for soft delete
-
+            
+            $table->enum('question_placing',['up','down'])->nullable(); // Active/Inactive Status
             // Foreign Key Constraint
             $table->foreign('blast_id')->references('id')->on('blasts')->onDelete('cascade');
             // Unique constraint on blast_id

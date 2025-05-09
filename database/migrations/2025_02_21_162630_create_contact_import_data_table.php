@@ -20,8 +20,9 @@ return new class extends Migration
             $table->unsignedBigInteger('contact_type_id'); // Foreign Key for contact type
             $table->string('c_fname'); // First Name
             $table->string('c_lname'); // Last Name
-            $table->string('c_email')->unique(); // Email
+            $table->string('c_email')->nullable(); // Email
             $table->string('c_phno', 15)->nullable(); // Phone Number
+            $table->string('c_country')->nullable(); // City
             $table->string('c_city')->nullable(); // City
             $table->string('c_state')->nullable(); // State
             $table->string('c_timezone')->nullable(); // Timezone

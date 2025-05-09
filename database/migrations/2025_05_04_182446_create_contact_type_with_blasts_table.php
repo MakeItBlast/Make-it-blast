@@ -13,18 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('blasts', function (Blueprint $table) {
-            $table->id(); 
-            $table->string('blast_name');
-            $table->unsignedBigInteger('tempelate_id')->nullable();; // Required field
+        Schema::create('contact_type_with_blasts', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('contact_type_id'); // Required field
             $table->unsignedBigInteger('user_id'); // Required field
-            $table->text('tempelate_structure')->nullable(); // Optional field
-            $table->enum('status',['sent','scheduled'])->nullable(); // Optional default status
+            $table->unsignedBigInteger('blast_id'); // Required field
             $table->timestamps();
-            $table->softDeletes();
-            //connection
-            $table->foreign('tempelate_id')->references('id')->on('tempelates')->onDelete('cascade');
+
+            //foreign key connection 
+            $table->foreign('contact_type_id')->references('id')->on('contact_types')->onDelete('cascade');
+            $table->foreign('blast_id')->references('id')->on('blasts')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
         });
     }
 
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('blasts');
+        Schema::dropIfExists('contact_type_with_blasts');
     }
 };

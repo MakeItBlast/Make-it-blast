@@ -18,11 +18,17 @@ return new class extends Migration
             $table->string('subsc_name'); // Subscription name
             $table->integer('keyword_allowed_count'); // Number of keywords allowed
             $table->integer('duration'); // Duration of the subscription (e.g., in months)
-            $table->decimal('credit_cost', 10, 2); // Cost in credits
+            $table->integer('credit_cost'); // Cost in credits
             $table->decimal('monthly_cost', 10, 2); // Monthly cost of the subscription
             $table->decimal('discount', 5, 2)->default(0); // Discount applied to the subscription (percentage)
             $table->decimal('yearly_cost', 10, 2); // Yearly cost of the subscription
             $table->decimal('surcharge', 10, 2)->default(0); // Surcharge (optional extra charge)
+            $table->integer('sms_allowed_count')->nullable();
+            $table->integer('email_allowed_count')->nullable();
+            $table->integer('social_allowed_count')->nullable();
+            $table->integer('ai_allowed_count')->nullable();
+            $table->integer('image_allowed_count')->nullable();
+            $table->integer('replies_allowed_count')->nullable();
             $table->enum('status', ['active', 'inactive', 'suspended'])->default('active'); // Subscription status
             $table->timestamps(); // Timestamps for created_at and updated_at
             $table->softDeletes(); // Soft delete column (deleted_at) for soft deleting records

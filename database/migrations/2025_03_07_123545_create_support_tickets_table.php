@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('title'); // String column for the title
             $table->text('message'); // Text column for the message
             $table->string('ticket_id'); // String column for the title
+           // $table->string('problem_type'); // String column for the title
+            $table->unsignedBigInteger('problem_type'); 
             $table->enum('priority', ['low', 'medium','high']); // Enum column for the status
             $table->string('supporting_image')->nullable(); // String column for the supporting image (nullable)
             $table->enum('status', ['open', 'closed'])->default('open'); // Enum column for the status
@@ -26,6 +28,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id'); 
             
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('problem_type')->references('id')->on('issue_types')->onDelete('cascade');
         });
     }
 

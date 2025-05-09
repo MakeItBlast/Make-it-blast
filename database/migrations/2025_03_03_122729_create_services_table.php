@@ -17,7 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('service_name'); // Service name (string column)
             $table->text('service_desc'); // Service description (text column for longer content)
-            $table->unsignedBigInteger('system_value_id'); 
+            $table->integer('yearly_discount');
+            $table->integer('cost_per_blast');
             $table->enum('flat_rate', ['active', 'inactive'])->default('inactive'); // Status column with a default value of 'active'
             $table->enum('status', ['active', 'inactive'])->default('active'); // Status column with a default value of 'active'
             $table->timestamps();
