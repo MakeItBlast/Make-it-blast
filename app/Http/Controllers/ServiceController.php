@@ -8,42 +8,49 @@ use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
-    public function storeService(Request $request){
+    public function storeService(Request $request) {
         try {
+            // Check if it's an update (id present) or create
+            $isUpdate = $request->has('id');
+    
             // Validate incoming request data
             $validator = Validator::make($request->all(), [
-                'service_name'      => 'required|string|max:255', // Ensures it's a required string with max length of 255
-                'service_desc'      => 'nullable|string|max:500', // Optional string with max length of 500
-                'system_value_id'   => 'required|integer|exists:system_values,id', // Required integer that must exist in the system_values table
-                'flat_rate'         => 'required|numeric|min:0', // Required numeric value, must be greater than or equal to 0
+                'service_name'      => 'required|string|max:255',
+                'service_desc'      => 'nullable|string|max:500',
+                'system_value_id'   => 'required|integer|exists:system_values,id',
+                'flat_rate'         => 'required|numeric|min:0',
             ]);
-             
+    
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
     
-
-
-            // Construct an associative array for insertion
-            $newService = [
-                'service_name' => $request->input('service_name'),
-                'service_desc' => $request->input('service_desc'),
-                'system_value_id' => $request->input('system_value_id'),
-                'flat_rate' => $request->input('flat_rate'),
+            // Prepare data array
+            $serviceData = [
+                'service_name'     => $request->input('service_name'),
+                'service_desc'     => $request->input('service_desc'),
+                'system_value_id'  => $request->input('system_value_id'),
+                'flat_rate'        => $request->input('flat_rate'),
             ];
-
-           
-            // Create a new record in the database
-            $addNewService = Service::create($newService);
-
-            if($addNewService){
-                return redirect()->back()->with('success', "New Service added successfully");
-            }else{
-                return redirect()->back()->with('success', "Service Not Added");
+    
+            if ($isUpdate) {
+                $service = Service::find($request->input('id'));
+                if (!$service) {
+                    return redirect()->back()->with('error', "Service not found");
+                }
+                $service->update($serviceData);
+                return redirect()->back()->with('success', "Service updated successfully");
+            } else {
+                $newService = Service::create($serviceData);
+                if ($newService) {
+                    return redirect()->back()->with('success', "New Service added successfully");
+                } else {
+                    return redirect()->back()->with('error', "Service not added");
+                }
             }
-
+    
         } catch (\Exception $e) {
-          
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
 
