@@ -16,5 +16,11 @@ class SupportTicket extends Model
         'supporting_image',
         'user_id',
         'status',
+        'problem_type',
     ];
+
+    public function issueType()
+{
+    return $this->belongsTo(IssueType::class, 'problem_type');
+}
 }

@@ -17,6 +17,12 @@ class Subscription extends Model
         'discount',
         'yearly_cost',
         'surcharge',
+        'sms_allowed_count',
+        'email_allowed_count',
+        'social_allowed_count',
+        'ai_allowed_count',
+        'image_allowed_count',
+        'replies_allowed_count',
         'status',
     ];
 }

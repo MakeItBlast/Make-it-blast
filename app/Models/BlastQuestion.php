@@ -12,5 +12,12 @@ class BlastQuestion extends Model
       'question',
         'blast_id',
         'status',
+        'question_placing',
     ];
+
+
+    public function blast()
+    {
+        return $this->belongsTo(Blast::class, 'blast_id');
+    }
 }

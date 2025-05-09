@@ -5,15 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Tempelate extends Model
+class SubscriptionPaymentLog extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'user_id',
-        'template_structure',
-        'template_by',
-        'temp_name',
+        'transaction_id',
+        'amount',
+        'currency',
         'status',
+        'payment_method',
+        'subscription_items',
+        'stripe_response',
     ];
 }
-

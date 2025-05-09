@@ -16,14 +16,14 @@ class Blast extends Model
         'status',
     ];
  
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::saving(function ($model) {
-            if (empty($model->tempelate_id) === empty($model->tempelate_structure)) {
-                throw new \Exception('Either tempelate_id or tempelate_structure must be provided, but not both.');
-            }
-        });
-    }
+    //     static::saving(function ($model) {
+    //         if (empty($model->tempelate_id) === empty($model->tempelate_structure)) {
+    //             throw new \Exception('Either tempelate_id or tempelate_structure must be provided, but not both.');
+    //         }
+    //     });
+    // }
 }

@@ -15,12 +15,15 @@ class UserMetaData extends Model
         'city',
         'state',
         'country',
-        'phno',
-        'first_name',
-        'last_name',
         'billing_email',      
         'avatar',
         'user_id',
+        'status',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class,'user_id');
+    }
 }
 

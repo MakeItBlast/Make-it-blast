@@ -15,6 +15,7 @@ class ContactImportData extends Model
         'c_lname',
         'c_email',
         'c_phno',
+        'c_country',
         'c_city',
         'c_state',
         'c_timezone',
@@ -27,6 +28,11 @@ class ContactImportData extends Model
     public function contactType()
     {
         return $this->belongsTo(ContactType::class, 'contact_type_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
 

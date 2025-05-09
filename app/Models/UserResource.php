@@ -11,9 +11,9 @@ class UserResource extends Model
     protected $fillable = [
         'rsrc_type',
         'rsrc_name',
+        'rsrc_value',
         'user_id',
         'status',
-        'blast_id',
     ];
 }
 

@@ -5,15 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Service extends Model
+class ContactTypeWithBlast extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'service_name',
-        'service_desc',
-        'flat_rate',
-        'status',
-        'cost_per_blast',
-        'yearly_discount',
+        'contact_type_id',
+        'user_id',
+        'blast_id',
     ];
 }
