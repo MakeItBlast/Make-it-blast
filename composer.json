@@ -10,7 +10,12 @@
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/socialite": "^5.17",
-        "laravel/tinker": "^2.7"
+        "laravel/tinker": "^2.7",
+        "phpmailer/phpmailer": "^6.9",
+        "stripe/stripe-php": "^16.5",
+		"symfony/http-client": "^6.2",
+		"symfony/mailgun-mailer": "^6.2",
+        "twilio/sdk": "^8.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
