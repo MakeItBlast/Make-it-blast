@@ -7,6 +7,9 @@ use App\Models\SocialMediaLogin;
 use App\Models\UserMetaData;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
+use App\Models\SubscriptionConnUser;
+use App\Models\Blast;
+use App\Models\BlastAnswer;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Validator;
@@ -56,6 +59,7 @@ class UserController extends Controller
                     'name' => $socialUser->getName(),
                     'email' => $socialUser->getEmail(),
                     'password' => bcrypt('default_password'), // Default password (change later)
+                    'status' => 'incomplete',
                 ]);
             }
 
@@ -74,8 +78,12 @@ class UserController extends Controller
                 ]);
             }
 
-            // Log in the user
-            Auth::login($user);
+            if ($user->status !== 'deleted') {
+                Auth::login($user);
+            } else {
+                // Handle the case where the user is deleted
+                return redirect('/')->withErrors(['account' => 'This account has been deleted.']);
+            }
 
             // Redirect to dashboard
             return redirect('/account')->with('success', 'Logged in successfully!');
@@ -83,10 +91,13 @@ class UserController extends Controller
             return redirect('/login')->with('error', 'Something went wrong. Please try again.');
         }
     }
+
     /*store user meta data  */
     public function storeUserMetaData(Request $request) {
         try {
-            // Validate incoming request data
+            print_r($request->all());
+            
+            // Validation
             $validator = Validator::make($request->all(), [
                 'company_name'    => 'required|string|max:255',
                 'address'         => 'required|string|max:500',
@@ -94,11 +105,11 @@ class UserController extends Controller
                 'city'            => 'required|string|max:255',
                 'state'           => 'required|string|max:255',
                 'country'         => 'required|string|max:255',
-                'phno'            => 'required|numeric|digits:10',
+                'phno'            => 'required|string|max:14',
                 'first_name'      => 'required|string|max:100',
                 'last_name'       => 'required|string|max:100',
-                'billing_email'   => 'required|email|max:255',
-                'avatar'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'billing_email'   => 'required|email|max:255|confirmed',
+                'avatar'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             ]);
     
             if ($validator->fails()) {
@@ -107,40 +118,59 @@ class UserController extends Controller
     
             $curr_userId = auth()->id();
     
-            // Construct an associative array for insertion
-            $UserMeta = [
-                'company_name' => $request->input('company_name'),
-                'address' => $request->input('address'),
-                'zipcode' => $request->input('zipcode'),
-                'city' => $request->input('city'),
-                'state' => $request->input('state'),
-                'country' => $request->input('country'),
-                'phno' => $request->input('phno'),
-                'first_name' => $request->input('first_name'),
-                'last_name' => $request->input('last_name'),
-                'billing_email' => $request->input('billing_email'),
-                'avatar' => $request->file('avatar') ? $request->file('avatar')->store('avatars', 'public') : null, // Store the avatar if uploaded
-                'user_id' => $curr_userId,
+            // Load existing data
+            $existingMeta = UserMetaData::where('user_id', $curr_userId)->first();
+            $existingUser = User::find($curr_userId);
+    
+            // Prepare new data
+            $newMetaData = [
+                'company_name'   => $request->input('company_name'),
+                'address'        => $request->input('address'),
+                'zipcode'        => $request->input('zipcode'),
+                'city'           => $request->input('city'),
+                'state'          => $request->input('state'),
+                'country'        => $request->input('country'),
+                'billing_email'  => $request->input('billing_email'),
+                'avatar'         => $request->file('avatar') ? $request->file('avatar')->store('avatars', 'public') : ($existingMeta->avatar ?? null),
+                'user_id'        => $curr_userId,
+                'status'         => 'active',
             ];
     
-            // Try to find the user metadata by user_id
-            $userMeta = UserMetaData::updateOrCreate(
-                ['user_id' => $curr_userId], // Condition to check if data exists
-                $UserMeta // Data to update or insert
+            $newUserData = [
+                'mobile_number'  => $request->input('phno'),
+                'name'           => $request->input('first_name'),
+                'last_name'      => $request->input('last_name'),
+                'status'         => 'complete'
+            ];
+    
+            // Compare changes
+            $metaChanged = !$existingMeta || collect($newMetaData)->except('avatar')->diffAssoc($existingMeta->toArray())->isNotEmpty();
+            $userChanged = collect($newUserData)->diffAssoc($existingUser->only(array_keys($newUserData)))->isNotEmpty();
+    
+            if (!$metaChanged && !$userChanged) {
+                return redirect()->back()->with('error', 'Nothing to update.');
+            }
+    
+            // Update or create user meta
+            UserMetaData::updateOrCreate(
+                ['user_id' => $curr_userId],
+                $newMetaData
             );
     
-            $msg_to_show = $userMeta->wasRecentlyCreated ? 'User registered successfully!' : 'User updated successfully!';
+            // Update user table only if data changed
+            if ($userChanged) {
+                $existingUser->update($newUserData);
+            }
     
-            // Redirect back with success message
-            return redirect()->back()->with('success', $msg_to_show);
+            return redirect('dashboard')->with('success', 'User information updated successfully!');
     
         } catch (\Exception $e) {
-            // If an error occurs
             return redirect()->back()
                 ->withErrors(['error' => 'Some critical error: ' . $e->getMessage()])
                 ->withInput();
         }
     }
+    
      
    
 // public function storeProfileImage(Request $request)
@@ -209,7 +239,7 @@ public function storeProfileImage(Request $request)
     try {
         // Validate the uploaded image if present
         $validator = Validator::make($request->all(), [
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         // If validation fails, return a response with errors
@@ -265,10 +295,12 @@ public function storeProfileImage(Request $request)
         $pre_email = $user->email;
         $pre_phno = $user->mobile_number;
         $pre_name = $user->name;
+        $pre_last = $user->last_name;
        
          $userMetaData = UserMetaData::where('user_id', $user->id)->first();
         
         $userMetaData['pre_name'] = $pre_name;
+        $userMetaData['pre_last'] = $pre_last; 
         $userMetaData['pre_email'] = $pre_email;
         $userMetaData['pre_phno'] = $pre_phno;
 
@@ -279,4 +311,31 @@ public function storeProfileImage(Request $request)
         
     }
     
+
+
+
+    //sedning data to dashboard view
+
+    public function showDashboardPage(){
+
+        $cid = auth()->id();
+
+        $subscriptionData = SubscriptionConnUser::where('user_id', $cid)
+            ->with(['subscription', 'payment'])
+            ->get();
+
+        $userBlastData = Blast::where('user_id', $cid)->get();
+
+        $availableAnswere = BlastAnswer::with(['contact', 'question.blast']) // include contact and blast
+        ->whereHas('contact.user', function ($query) use ($cid) {
+            $query->where('id', $cid);
+        })
+        ->get();
+
+      
+
+        return view('admin.pages.my-dashboard', compact('subscriptionData','userBlastData','availableAnswere'));
+
+    }
+
 }
