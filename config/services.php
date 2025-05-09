@@ -32,6 +32,19 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
     ],
     
+    'linkedin' => [
+    'client_id' => env('LINKEDIN_CLIENT_ID'),
+    'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+    'redirect' => env('LINKEDIN_REDIRECT_URI'),
+    ],
+    
+    'twilio' => [
+    'sid' => env('TWILIO_SID'),
+    'token' => env('TWILIO_AUTH_TOKEN'),
+    'from' => env('TWILIO_FROM'),
+    'to' => env('TWILIO_TO'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
