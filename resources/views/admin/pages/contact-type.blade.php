@@ -1,10 +1,13 @@
 @extends('admin.layout.app')
+
+@section('styles')
 <link rel="stylesheet" href="{{ asset('styles/contact-type.css') }}">
+@stop
+
 
 @section('content')
+
 <!-- Display any errors if present -->
-
-
 @if ($errors->any())
 <div class="overlay" id="errorOverlay" data-close="true"> <!-- Overlay with data attribute -->
     <div class="popup-box error-box" id="errorBox" data-close="false">
@@ -62,34 +65,37 @@ exit();
                     </tr>
                 </thead>
                 <tbody>
-                    @php $incr = 1; @endphp
                     @forelse($contactTypes as $contactType)
                     <tr>
-                        <td>{{ $incr }}</td>
+                        <td>{{ $contactType->id }}</td>
                         <td>{{ $contactType->contact_type }}</td>
                         <td>{{ $contactType->contact_desc }}</td>
                         <td>{{ $contactType->status == 'active' ? 'Active' : 'Inactive' }}</td>
-                        <td class="operation-icons">
-                            <a href="{{ url('update-contact-type/'.$contactType->id) }}"><i class="fa-solid fa-pencil"></i></a>
-
-                            <a href="#" class="delete-card-btn" data-url="{{ url('delete-contact-type/'.$contactType->id) }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                <i class="fa-solid fa-trash-can"></i></a>
+                        <td>
+                            <div class="action-btns">
+                                <a class="btn btn-sm edit-btn" href="{{ url('update-contact-type/'.$contactType->id) }}"><i class="fa-solid fa-pencil"></i></a>
+                                <a href="#" class="btn btn-outline-primary btn-sm delete-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                    data-contact-type-id="{{ $contactType->id }}"
+                                    data-action-url="{{ url('delete-contact-type/'.$contactType->id) }}">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
-                    @php $incr++; @endphp
+
                     @empty
                     <tr>
                         <td colspan="5" class="text-center">No contact types available.</td>
                     </tr>
                     @endforelse
-
-
                 </tbody>
             </table>
 
         </div>
 
-        <p class="text-end"><strong>Total = {{count($contactTypes)}}</strong></p>
+        <p class="text-end"><strong>Total number of contact types = {{count($contactTypes)}}</strong></p>
     </div>
 
     <div class="tab-bg m-y4">
@@ -117,7 +123,9 @@ exit();
             <button type="submit" class="btn btn-success">
                 {{ $updateContactType ?? false ? 'UPDATE' : 'SAVE' }}
             </button>
-            <button type="reset" class="btn btn-secondary">CLEAR</button>
+            @if(empty($updateContactType) || empty($updateContactType->id))
+            <button type="reset" class="btn btn-secondary">Clear</button>
+            @endif
 
         </form>
     </div>
@@ -127,20 +135,18 @@ exit();
 </div>
 
 
-
-<!-- Delete Confirmation Modal -->
+<!-- Delete Modal Box -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="" id="deleteCardForm">
+            <form method="GET" action="#" id="deleteContactTypeForm">
                 @csrf
-                @method('DELETE') <!-- This tells Laravel to treat it as a DELETE request -->
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this credit card?
+                    Are you sure you want to delete this contact type?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -156,19 +162,35 @@ exit();
 <script>
     // Close error box
     function closeErrorBox() {
-        const errorOverlay = document.getElementById('errorOverlay');
+        const errorOverlay = document.getElementById("errorOverlay");
         if (errorOverlay) {
-            errorOverlay.style.display = 'none';
+            errorOverlay.style.display = "none";
         }
     }
 
-    // Close success popup
+    // Close success box
     function closePopup() {
-        const successOverlay = document.getElementById('successOverlay');
+        const successOverlay = document.getElementById("successOverlay");
         if (successOverlay) {
-            successOverlay.style.display = 'none';
+            successOverlay.style.display = "none";
         }
     }
+
+    // Close overlay if user clicks outside the popup box
+    window.addEventListener("DOMContentLoaded", () => {
+        const successOverlay = document.getElementById("successOverlay");
+        const errorOverlay = document.getElementById("errorOverlay");
+
+        document.addEventListener("click", function(event) {
+            if (successOverlay && event.target === successOverlay && successOverlay.getAttribute("data-close") === "true") {
+                closePopup();
+            }
+
+            if (errorOverlay && event.target === errorOverlay && errorOverlay.getAttribute("data-close") === "true") {
+                closeErrorBox();
+            }
+        });
+    });
 
     document.addEventListener("DOMContentLoaded", function() {
         const deleteButtons = document.querySelectorAll(".delete-card-btn");
@@ -205,7 +227,7 @@ exit();
     });
 
     // for data tables
-
+    $.fn.dataTable.ext.errMode = 'none';
     $(document).ready(function() {
         $('.dataTable').DataTable({
             "paging": true,
@@ -224,6 +246,17 @@ exit();
             }
         });
     });
+
+    // Delete contact type logic 
+    document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const actionUrl = this.getAttribute('data-action-url');
+            document.getElementById('deleteContactTypeForm').action = actionUrl;
+        });
+    });
+});
 </script>
 
 @stop

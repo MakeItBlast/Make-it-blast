@@ -1,5 +1,9 @@
 @extends('admin.layout.app')
+
+@section('styles')
 <link rel="stylesheet" href="{{ asset('styles/blast-report.css') }}">
+@stop
+
 
 @section('content')
 @if ($errors->any())
@@ -45,29 +49,29 @@ exit();
     <div class="tab-bg p-4">
 
         <h5><strong>Report Filter</strong></h5>
-
+<form method="post" action="{{url('/filter-report')}}">
         <div class="row">
             <div class="col-md-3">
                 <label>Select Subscription</label>
-                <select class="form-select">
+                <select class="form-select" name="subscription">
                     <option selected>Choose...</option>
                 </select>
             </div>
             <div class="col-md-3">
                 <label>Credits More Than</label>
-                <input type="number" class="form-control">
+                <input type="number" class="form-control" name="more_credit">
             </div>
             <div class="col-md-3">
                 <label>Credits Less Than</label>
-                <input type="number" class="form-control">
+                <input type="number" class="form-control" name="less_credit">
             </div>
             <div class="col-md-3">
                 <label>Start Date</label>
-                <input type="date" class="form-control">
+                <input type="date" class="form-control" name="start_date">
             </div>
             <div class="col-md-3 mt-2">
                 <label>End Date</label>
-                <input type="date" class="form-control">
+                <input type="date" class="form-control" name="end_date">
             </div>
         </div>
 
@@ -75,26 +79,26 @@ exit();
         <div class="row">
             <div class="col-md-6">
                 <label>Company Name</label>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" name="company_name">
             </div>
         </div>
 
         <div class="row mt-2">
             <div class="col-md-3">
                 <label>First Name</label>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" name="first_name">
             </div>
             <div class="col-md-3">
                 <label>Last Name</label>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" name="last_name">
             </div>
             <div class="col-md-3">
                 <label>City</label>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" name="city">
             </div>
             <div class="col-md-3">
                 <label>State</label>
-                <select class="form-select">
+                <select class="form-select" name="state">
                     <option selected>Choose...</option>
                 </select>
             </div>
@@ -103,25 +107,25 @@ exit();
         <div class="row mt-2">
             <div class="col-md-3">
                 <label>SMS / Email / Both</label>
-                <select class="form-select">
+                <select class="form-select" name="options">
                     <option selected>Choose...</option>
                 </select>
             </div>
             <div class="col-md-3">
                 <label>Blast Start Time</label>
-                <select class="form-select">
+                <select class="form-select" name="blast_start_time" >
                     <option selected>Choose...</option>
                 </select>
             </div>
             <div class="col-md-3">
                 <label>Blast End Time</label>
-                <select class="form-select">
+                <select class="form-select" name="blast_end_time">
                     <option selected>Choose...</option>
                 </select>
             </div>
             <div class="col-md-3">
                 <label>Time Zone</label>
-                <select class="form-select">
+                <select class="form-select" name="time_zone">
                     <option selected>Choose...</option>
                 </select>
             </div>
@@ -130,23 +134,23 @@ exit();
         <div class="row mt-2">
             <div class="col-md-3">
                 <label>Integration</label>
-                <select class="form-select">
+                <select class="form-select" name="integration">
                     <option selected>Choose...</option>
                 </select>
             </div>
             <div class="col-md-3">
                 <label>Pictures</label>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" name="picture">
             </div>
             <div class="col-md-3">
                 <label>Text Reply</label>
-                <select class="form-select">
+                <select class="form-select" name="reply_text">
                     <option selected>Choose...</option>
                 </select>
             </div>
             <div class="col-md-3">
                 <label>Failures</label>
-                <select class="form-select">
+                <select class="form-select" name="failures">
                     <option selected>Choose...</option>
                 </select>
             </div>
@@ -155,16 +159,16 @@ exit();
         <div class="row mt-2">
             <div class="col-12">
                 <label>Search Text</label>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" name="search_text">
             </div>
         </div>
-
+</form>
         <hr>
         <h5><strong>Report Options</strong></h5>
         <div class="row">
             <div class="col-md-3">
                 <label>Integration</label>
-                <select class="form-select">
+                <select class="form-select" name="integration">
                     <option selected>Choose...</option>
                 </select>
             </div>

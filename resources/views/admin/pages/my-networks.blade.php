@@ -1,5 +1,9 @@
 @extends('admin.layout.app')
+
+@section('styles')
 <link rel="stylesheet" href="{{ asset('styles/my-networks.css') }}">
+@stop
+
 
 @section('content')
 @if ($errors->any())
@@ -43,76 +47,81 @@ exit();
 <div class="container my-4 py-4">
 
     <div class="container">
-        <h4 class="mb-3">Social Media Integration</h4>
 
-        <div class="social">
-            <table class="table align-middle">
-                <thead>
-                    <tr>
-                        <th>Enabled</th>
-                        <th>Digital Media Network</th>
-                        <th>Media Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Google -->
-                    <tr>
-                        <td><input type="checkbox" checked></td>
-                        <td>
-                            <button class="login-btn"><i class="fab fa-google"></i> Log in with Google</button>
-                        </td>
-                        <td><span class="status-connected">Connected</span></td>
-                        <td><button class="btn btn-outline-dark btn-sm">Dis-Connect</button></td>
-                    </tr>
-                    <!-- Apple -->
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td>
-                            <button class="login-btn"><i class="fab fa-apple"></i> Log in with Apple</button>
-                        </td>
-                        <td><span class="status-disconnected">Dis-Connected</span></td>
-                        <td><button class="btn btn-outline-dark btn-sm">Connect</button></td>
-                    </tr>
-                    <!-- Facebook -->
-                    <tr>
-                        <td><input type="checkbox" checked></td>
-                        <td>
-                            <button class="login-btn"><i class="fab fa-facebook"></i> Log in with Facebook</button>
-                        </td>
-                        <td><span class="status-connected">Connected</span></td>
-                        <td><button class="btn btn-outline-dark btn-sm">Dis-Connect</button></td>
-                    </tr>
-                    <!-- Twitter -->
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td>
-                            <button class="login-btn"><i class="fab fa-twitter"></i> Log in with Twitter</button>
-                        </td>
-                        <td><span class="status-connected">Connected</span></td>
-                        <td><button class="btn btn-outline-dark btn-sm">Dis-Connect</button></td>
-                    </tr>
-                    <!-- Instagram -->
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td>
-                            <button class="login-btn"><i class="fab fa-instagram"></i> Log in with Instagram</button>
-                        </td>
-                        <td><span class="status-disconnected">Dis-Connected</span></td>
-                        <td><button class="btn btn-outline-dark btn-sm">Connect</button></td>
-                    </tr>
-                    <!-- TikTok -->
-                    <tr>
-                        <td><input type="checkbox" checked></td>
-                        <td>
-                            <button class="login-btn"><i class="fab fa-tiktok"></i> Log in with TikTok</button>
-                        </td>
-                        <td><span class="status-connected">Connected</span></td>
-                        <td><button class="btn btn-outline-dark btn-sm">Dis-Connect</button></td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="tab-bg">
+            <h4 class="mb-3">Social Media Integration</h4>
+
+            <div class="social">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Enabled</th>
+                            <th>Digital Media Network</th>
+                            <th>Media Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Google -->
+                        <tr>
+                            <td><input type="checkbox" checked></td>
+                            <td>
+                                <button class="login-btn"><i class="fab fa-google"></i> Log in with Google</button>
+                            </td>
+                            <td><span class="status-connected">Connected</span></td>
+                            <td><button class="btn btn-outline-dark btn-sm">Dis-Connect</button></td>
+                        </tr>
+                        <!-- Apple -->
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>
+                                <button class="login-btn"><i class="fab fa-apple"></i> Log in with Apple</button>
+                            </td>
+                            <td><span class="status-disconnected">Dis-Connected</span></td>
+                            <td><button class="btn btn-outline-dark btn-sm">Connect</button></td>
+                        </tr>
+                        <!-- Facebook -->
+                        <tr>
+                            <td><input type="checkbox" checked></td>
+                            <td>
+                                <button class="login-btn"><i class="fab fa-facebook"></i> Log in with Facebook</button>
+                            </td>
+                            <td><span class="status-connected">Connected</span></td>
+                            <td><button class="btn btn-outline-dark btn-sm">Dis-Connect</button></td>
+                        </tr>
+                        <!-- Twitter -->
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>
+                                <button class="login-btn"><i class="fab fa-twitter"></i> Log in with Twitter</button>
+                            </td>
+                            <td><span class="status-connected">Connected</span></td>
+                            <td><button class="btn btn-outline-dark btn-sm">Dis-Connect</button></td>
+                        </tr>
+                        <!-- Instagram -->
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>
+                                <button class="login-btn"><i class="fab fa-instagram"></i> Log in with Instagram</button>
+                            </td>
+                            <td><span class="status-disconnected">Dis-Connected</span></td>
+                            <td><button class="btn btn-outline-dark btn-sm">Connect</button></td>
+                        </tr>
+                        <!-- TikTok -->
+                        <tr>
+                            <td><input type="checkbox" checked></td>
+                            <td>
+                                <button class="login-btn"><i class="fab fa-tiktok"></i> Log in with TikTok</button>
+                            </td>
+                            <td><span class="status-connected">Connected</span></td>
+                            <td><button class="btn btn-outline-dark btn-sm">Dis-Connect</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
+
+
     </div>
 </div>
 

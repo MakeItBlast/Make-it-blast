@@ -1,70 +1,99 @@
+@php
+use App\Models\User;
+
+$c_id = auth()->id();
+$user = user::find($c_id);
+@endphp
+
 <!-- Sidebar -->
 <div id="sidebar" class="sidebar">
-    <div class="sidebar-header">
-        <h2 class="sidebar-title">Make It Blast</h2>
-        <img src="https://cdn-icons-png.flaticon.com/512/25/25694.png" alt="Icon" class="collapsed-logo">
+
+    <button id="closeSidebar" class="btn btn-link text-white d-lg-none float-end">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="sidebar-header d-flex justify-content-between align-items-center">
+        <a href="{{ url('dashboard') }}">
+            <img src="{{ asset('media/Blast Logo.png') }}" alt="logo" class="main-logo">
+        </a>
     </div>
 
-    <ul>
-        <li>
-            <a href="{{ url('dashboard') }}"><i class="fas fa-tachometer-alt"></i> <span>My Dashboard</span></a>
-        </li>
+    <!-- User Menu Items  -->
+    <a href="{{ url('dashboard') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}">
+        <i class="fas fa-tachometer-alt"></i> <span>My Dashboard</span>
+    </a>
 
-        <li>
-            <a href="{{ url('create-blast') }}"><i class="fas fa-bolt"></i> <span>Create A Blast</span></a>
-        </li>
+    @if($user->status =='complete')
+    <a href="{{ url('create-blast') }}" class="{{ request()->is('create-blast') ? 'active' : '' }}">
+        <i class="fas fa-bolt"></i> <span>Create A Blast</span>
+    </a>
+    @endif
 
-        <li>
-            <a href="{{ url('billing-payments') }}"><i class="fas fa-credit-card"></i> <span>Blast Payments</span></a>
-        </li>
+    <a href="{{ url('billing-payments') }}" class="{{ request()->is('billing-payments') ? 'active' : '' }}">
+        <i class="fas fa-credit-card"></i> <span>Billing Payments</span>
+    </a>
 
-        <li>
-            <a href="{{ url('service-payments') }}"><i class="fas fa-money-bill-wave"></i> <span>Service Payments</span></a>
-        </li>
+    <div class="submenu-wrapper">
+        <a href="#" class="submenu-toggle">
+            <i class="fa-solid fa-bars-progress"></i> <span>Manage My Blasts</span>
+            <i class="fas fa-chevron-down ms-auto"></i>
+        </a>
+        <ul class="submenu">
+            <li><a href="{{ url('contact-type') }}"> <i class="fas fa-angle-right"></i> <span>Contact Type</span></a></li>
+            <li><a href="{{ url('my-contacts') }}"> <i class="fas fa-angle-right"></i> <span>My Contacts</span></a></li>
+            <li><a href="{{ url('my-networks') }}"> <i class="fas fa-angle-right"></i> <span>My Network</span></a></li>
+            <li><a href="{{ url('my-template') }}"> <i class="fas fa-angle-right"></i> <span>My Template</span> </a></li>
+        </ul>
+    </div>
 
-        <li>
-            <a href="#" class="submenu-toggle"><i class="fas fa-cogs"></i> <span>Subscription Management</span>
-                <i class="fas fa-chevron-down ms-auto"></i></a>
-            <ul class="submenu">
-                <li><a href="{{ url('manage-subscriptions') }}"><i class="fas fa-angle-right"></i> Subscriptions</a></li>
-                <li><a href="{{ url('create-services') }}"><i class="fas fa-angle-right"></i> Create Service</a></li>
-                <li><a href="{{ url('create-subscription') }}"><i class="fas fa-angle-right"></i> Setup Subscriptions</a></li>
-                <li><a href="{{ url('create-discount') }}"><i class="fas fa-angle-right"></i> Create Discount</a></li>
-            </ul>
-        </li>
+    <div class="submenu-wrapper">
+        <a href="#" class="submenu-toggle">
+            <i class="fas fa-users"></i> <span>User Management</span>
+            <i class="fas fa-chevron-down ms-auto"></i>
+        </a>
+        <ul class="submenu">
+            <li><a href="{{ url('account') }}"> <i class="fas fa-angle-right"></i> <span>User Account</span></a></li>
+            <li><a href="{{ url('subscription') }}"> <i class="fas fa-angle-right"></i> <span>Subscription / Credit</span></a></li>
+            <li><a href="{{ url('payment-info') }}"> <i class="fas fa-angle-right"></i> <span>Payment Information</span></a></li>
+            <li><a href="{{ url('contact') }}"> <i class="fas fa-angle-right"></i> <span>Contact Us</span></a></li>
+        </ul>
+    </div>
 
-        <li>
-            <a href="#" class="submenu-toggle"><i class="fa-solid fa-bars-progress"></i> <span>Manage My Blasts</span>
-                <i class="fas fa-chevron-down ms-auto"></i></a>
-            <ul class="submenu">
-                <li><a href="{{ url('contact-type') }}"><i class="fas fa-angle-right"></i>Contact Type</a></li>
-                <li><a href="{{ url('my-contacts') }}"><i class="fas fa-angle-right"></i>My Contacts</a></li>
-                <li><a href="{{ url('my-networks') }}"><i class="fas fa-angle-right"></i> My Network</a></li>
-                <li><a href="{{ url('my-template') }}"><i class="fas fa-angle-right"></i> My Template</a></li>
-            </ul>
-        </li>
+    <h5 style="color:#fff;" class="my-3">Admin Menus Below</h5>
 
-        <li>
-            <a href="{{ url('blast-report') }}"><i class="fas fa-chart-line"></i> <span>Blast Report</span></a>
-        </li>
+    <!-- Admin Menu Items -->
+    <div class="submenu-wrapper">
+        <a href="#" class="submenu-toggle">
+            <i class="fas fa-cogs"></i> <span>Subscription Management</span>
+            <i class="fas fa-chevron-down ms-auto"></i>
+        </a>
+        <ul class="submenu">
+            <li><a href="{{ url('manage-subscriptions') }}"> <i class="fas fa-angle-right"></i> Subscriptions</a></li>
+            <li><a href="{{ url('create-services') }}"> <i class="fas fa-angle-right"></i> Create Service</a></li>
+            <li><a href="{{ url('create-subscription') }}"> <i class="fas fa-angle-right"></i> Setup Subscriptions</a></li>
+            <li><a href="{{ url('create-discount') }}"> <i class="fas fa-angle-right"></i> Create Discount</a></li>
+        </ul>
+    </div>
 
-        <li>
-            <a href="{{ url('billing-payments') }}"><i class="fas fa-credit-card"></i> <span>Billing And Payments</span></a>
-        </li>
+    <a href="{{ url('blast-report') }}" class="{{ request()->is('blast-report') ? 'active' : '' }}">
+        <i class="fas fa-chart-line"></i> <span>Blast Report</span>
+    </a>
 
-        <li>
-            <a href="#" class="submenu-toggle"><i class="fas fa-users"></i> <span>User Management</span>
-                <i class="fas fa-chevron-down ms-auto"></i></a>
-            <ul class="submenu">
-                <li><a href="{{ url('account') }}"><i class="fas fa-angle-right"></i> User Account</a></li>
-                <li><a href="{{ url('subscription') }}"><i class="fas fa-angle-right"></i> Subscription / Credit</a></li>
-                <li><a href="{{ url('payment-info') }}"><i class="fas fa-angle-right"></i> Payment Information</a></li>
-                <li><a href="{{ url('contact') }}"><i class="fas fa-angle-right"></i> Contact Us</a></li>
-            </ul>
-        </li>
+    <a href="{{ url('blast-payments') }}" class="{{ request()->is('blast-payments') ? 'active' : '' }}">
+        <i class="fas fa-credit-card"></i> <span>Blast Payments</span>
+    </a>
 
-        <li>
-            <a href="{{ url('admin-dashboard') }}"><i class="fas fa-tachometer-alt"></i> <span>Admin Dashboard</span></a>
-        </li>
-    </ul>
+    <a href="{{ url('support-tickets') }}" class="{{ request()->is('support-tickets') ? 'active' : '' }}">
+        <i class="fa-solid fa-headset"></i> <span>Support Tickets</span>
+    </a>
+
+    <a href="{{ url('admin-dashboard') }}" class="{{ request()->is('admin-dashboard') ? 'active' : '' }}">
+        <i class="fas fa-tachometer-alt"></i> <span>Admin Dashboard</span>
+    </a>
+
+    <a href="{{ url('service-payments') }}" class="{{ request()->is('service-payments') ? 'active' : '' }}">
+        <i class="fas fa-money-bill-wave"></i> <span>Service Payments</span>
+    </a>
 </div>
+
+<!-- Mobile overlay -->
+<div id="sidebarOverlay" class="sidebar-overlay d-lg-none"></div>

@@ -1,5 +1,8 @@
 @extends('admin.layout.app')
+
+@section('styles')
 <link rel="stylesheet" href="{{ asset('styles/admin-dash.css') }}">
+@stop
 
 @section('content')
 @if ($errors->any())
@@ -29,8 +32,6 @@
 @endif
 
 
-
-
 @if (auth()->guest())
 {{-- Redirect to login page --}}
 @php
@@ -47,8 +48,8 @@ exit();
 
         <h2 class="my-4">Customer List</h2>
         <div class="table-responsive">
-            <table  class=" dataTable table table-bordered">
-                <thead class="table-dark">
+            <table class="dataTable table table-bordered">
+                <thead class="table-light">
                     <tr>
                         <th>Company</th>
                         <th>First</th>
@@ -62,68 +63,31 @@ exit();
                     </tr>
                 </thead>
                 <tbody>
+                    @foreach($user_data as $user)
                     <tr>
-                        <td>Group of People Network</td>
-                        <td>Francesine</td>
-                        <td>Williamson</td>
-                        <td>Michigan</td>
-                        <td>IN</td>
-                        <td>450232</td>
-                        <td>fwilliamson@</td>
-                        <td>12/31/2024</td>
+                        <td>{{ $user['company_name'] ?? '' }}</td>
+                        <td>{{ $user->user->name ?? '' }}</td>
+                        <td>{{ $user->user->last_name ?? '' }}</td>
+                        <td>{{ $user['city'] ?? '' }}</td>
+                        <td>{{ $user['state'] ?? '' }}</td>
+                        <td>{{ $user['zipcode'] ?? '' }}</td>
+                        <td>{{ $user['billing_email'] ?? '' }}</td>
+                        <td>{{ \Carbon\Carbon::parse($user['created_at'])->format('m/d/Y') ?? '' }}</td>
                         <td class="operation-icons">
-                            <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal"
+                            <button class="btn btn-outline-primary btn-sm rounded-circle view-btn" data-bs-toggle="modal"
                                 data-bs-target="#editModal">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
-                            <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal"
+                            <button class="btn btn-outline-primary btn-sm rounded-circle edit-btn" data-bs-toggle="modal"
                                 data-bs-target="#editModal">
                                 <i class="fa-solid fa-pencil"></i>
                             </button>
                         </td>
                     </tr>
-                    <tr>
-                        <td>Marcus Liberty Crew</td>
-                        <td>Glenn</td>
-                        <td>Hampton</td>
-                        <td>Killington</td>
-                        <td>MS</td>
-                        <td>650283</td>
-                        <td>hamptong@y</td>
-                        <td>11/04/2024</td>
-                        <td class="operation-icons">
-                            <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal"
-                                data-bs-target="#editModal">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
-                            <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal"
-                                data-bs-target="#editModal">
-                                <i class="fa-solid fa-pencil"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr class="highlight">
-                        <td>Justus Church in Christ</td>
-                        <td>Janice</td>
-                        <td>Drakington</td>
-                        <td>Lexington</td>
-                        <td>IL</td>
-                        <td>894832</td>
-                        <td>jdraking@ho</td>
-                        <td>09/14/2024</td>
-                        <td class="operation-icons">
-                            <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal"
-                                data-bs-target="#editModal">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
-                            <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal"
-                                data-bs-target="#editModal">
-                                <i class="fa-solid fa-pencil"></i>
-                            </button>
-                        </td>
-                    </tr>
+                    @endforeach
                 </tbody>
             </table>
+
         </div>
     </div>
 
@@ -141,7 +105,7 @@ exit();
         <h4 class="mt-3">Blast List</h4>
         <div class="table-responsive">
             <table class="dataTable table table-bordered">
-                <thead class="table-dark">
+                <thead class="table-light">
                     <tr>
                         <th>Invoice #</th>
                         <th>Blast Name</th>
@@ -157,39 +121,34 @@ exit();
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="text-green">
-                        <td>10203023</td>
-                        <td>Winter Rose Peeps</td>
-                        <td>1,203</td>
-                        <td>10</td>
-                        <td>2</td>
-                        <td>12/14/2024</td>
-                        <td>1130</td>
-                        <td>2,406</td>
-                        <td>0</td>
-                        <td>423</td>
-                        <td class="actions">
-                            <i class="fas fa-eye"></i>
-                            <i class="fas fa-edit"></i>
-                        </td>
+
+                    @if(!empty($blastInvoiceData) && count($blastInvoiceData) > 0)
+                    @foreach($blastInvoiceData as $invoice)
+                    <tr>
+                        <td>{{ $invoice->blast_invoice_num  ?? 'N/A' }}</td>
+                        <td>{{ $invoice->blast->blast_name ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field3 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field4 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field5 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->created_at ? \Carbon\Carbon::parse($invoice->created_at)->format('d/m/Y') : 'N/A' }}</td>
+                        <td>{{ $invoice->field7 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->blast->status ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field9 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field10 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field11 ?? 'N/A' }}</td>
                     </tr>
-                    <tr class="text-red">
-                        <td>10203421</td>
-                        <td>Micheal Birthday Party</td>
-                        <td>31,080</td>
-                        <td>5</td>
-                        <td>0</td>
-                        <td>12/24/2024</td>
-                        <td>2400</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td class="actions">
-                            <i class="fas fa-eye"></i>
-                            <i class="fas fa-edit"></i>
-                        </td>
+                    @endforeach
+                    @else
+                    <!-- Dummy row to prevent DataTables column mismatch -->
+                    <tr class="d-none">
+                        <td colspan="11"></td>
                     </tr>
+                    <tr>
+                        <td colspan="11" class="text-center">No Blasts Sent Yet.</td>
+                    </tr>
+                    @endif
                 </tbody>
+
             </table>
         </div>
         <p>Total Campaigns = 2</p>
@@ -292,32 +251,33 @@ exit();
 
     // for table with export functionality 
 
+    // for data tables
+    $.fn.dataTable.ext.errMode = 'none';
     $(document).ready(function() {
         $('.dataTable').DataTable({
-            dom: '<"top"Bf>rt<"bottom"ip>',
-            buttons: [{
-                extend: 'csv',
-                text: '<i class="fas fa-file-csv"></i> Export', // Label changed to "Export"
-                className: 'btn btn-outline-success'
-            }],
-            paging: true,
-            searching: true,
-            ordering: true,
-            lengthMenu: [10, 25, 50, 100],
-            pageLength: 10,
-            language: {
-                search: "Filter records:",
-                lengthMenu: "Show _MENU_ entries",
-                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                paginate: {
-                    next: "<i class='fas fa-chevron-right'></i>", // Next icon
-                    previous: "<i class='fas fa-chevron-left'></i>" // Previous icon
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "lengthMenu": [5, 10, 25, 50],
+            "pagingType": "simple_numbers",
+            "language": {
+                "search": "", // Removes "Search:" label
+                "lengthMenu": "Show _MENU_ entries",
+                "paginate": {
+                    "next": "<i class='fas fa-chevron-right'></i>",
+                    "previous": "<i class='fas fa-chevron-left'></i>"
                 }
+            },
+            "initComplete": function() {
+                $('.dataTables_filter input[type="search"]')
+                    .attr('placeholder', 'Search here...')
+                    .css({
+                        'width': '200px'
+                    }); // optional: styling
             }
         });
     });
-
-    
 </script>
 
 

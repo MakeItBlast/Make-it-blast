@@ -1,13 +1,14 @@
 @extends('admin.layout.app')
 
+@section('styles')
 <link rel="stylesheet" href="{{ asset('styles/my-dash.css') }}">
-
+@stop
 
 @section('content')
 
 @if ($errors->any())
-<div class="overlay" id="errorOverlay" data-close="true">   <!-- Overlay with data attribute -->
-    <div class="popup-box error-box" id="errorBox" data-close="false">   
+<div class="overlay" id="errorOverlay" data-close="true"> <!-- Overlay with data attribute -->
+    <div class="popup-box error-box" id="errorBox" data-close="false">
         <span class="close-btn" onclick="closeErrorBox()">&times;</span>
         <ul>
             @foreach ($errors->all() as $error)
@@ -19,8 +20,8 @@
 @endif
 
 @if (session('success'))
-<div class="overlay" id="successOverlay" data-close="true">   <!-- Overlay with data attribute -->
-    <div class="popup-box success-box" id="successBox" data-close="false">   
+<div class="overlay" id="successOverlay" data-close="true"> <!-- Overlay with data attribute -->
+    <div class="popup-box success-box" id="successBox" data-close="false">
         <button class="close-btn" onclick="closePopup()">
             <i class="fa-solid fa-xmark"></i>
         </button>
@@ -45,16 +46,17 @@ exit();
 <!-- Page Content -->
 <div class="container my-4 py-4">
 
-    <div class="tab-bg mt-4 mb-4">
+    <div class="tab-bg my-4">
         <!-- My Active Subscriptions -->
         <h3>My Active Subscriptions</h3>
 
         <div class="table-responsive">
-            <table class="dataTable table table-bordered">
+            <table  class="dataTable table table-bordered" style="width:100%;">
                 <thead class="table-light">
                     <tr>
+                        <th>S.No</th>
                         <th>Subscription Name</th>
-                        <th>Credit Card Number</th>
+                        <th>Start Date</th>
                         <th>Expiration Date</th>
                         <th>Last Processed</th>
                         <th>Days Remaining</th>
@@ -63,83 +65,33 @@ exit();
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Gold</td>
-                        <td>XXXX-XXXX-XXXX-2453</td>
-                        <td>1/23/2026</td>
-                        <td>12/23/2025</td>
-                        <td>Active</td>
-                        <td>Active</td>
-                        <td>500</td>
+                    @php $incr = 1; @endphp
+                    @if ($subscriptionData->count())
+                    @foreach ($subscriptionData as $subscription)
+                    @php
+                    $startDate = \Carbon\Carbon::parse($subscription->created_at);
+                    $expirationDate = $startDate->copy()->addDays($subscription->subscription->duration);
+                    $remainingDays = now()->diffInDays($expirationDate, false);
+                    @endphp
+                    <tr> 
+                        <td>{{ $incr++ }}</td>
+                        <td>{{ $subscription->subscription->subsc_name }}</td>
+                        <td>{{ $startDate->format('d-m-Y') }}</td>
+                        <td>{{ $expirationDate->format('d-m-Y') }}</td>
+                        <td>N/A</td>
+                        <td>{{ $remainingDays >= 0 ? $remainingDays : 'Expired' }}</td>
+                        <td>{{ $subscription->status }}</td>
+                        <td>{{ $subscription->subscription->credit_cost }}</td>
                     </tr>
+                    @endforeach
+                    @else
                     <tr>
-                        <td>Premium</td>
-                        <td>XXXX-XXXX-XXXX-2453</td>
-                        <td>1/23/2026</td>
-                        <td>12/23/2025</td>
-                        <td>Active</td>
-                        <td>Active</td>
-                        <td>500</td>
+                        <td colspan="8" class="text-center">No Active Subscriptons available. Please purchase</td>
                     </tr>
-                    <tr>
-                        <td>Platinum</td>
-                        <td>12233222525</td>
-                        <td>1/23/2052</td>
-                        <td>12/23/2025</td>
-                        <td>Active</td>
-                        <td>inactive</td>
-                        <td>5600</td>
-                    </tr>
-                    <tr>
-                        <td>Premium</td>
-                        <td>XXXX-XXXX-XXXX-2453</td>
-                        <td>1/23/2026</td>
-                        <td>12/23/2025</td>
-                        <td>Active</td>
-                        <td>Active</td>
-                        <td>500</td>
-                    </tr>
-                    <tr>
-                        <td>Premium</td>
-                        <td>XXXX-XXXX-XXXX-2453</td>
-                        <td>1/23/2026</td>
-                        <td>12/23/2025</td>
-                        <td>Active</td>
-                        <td>Active</td>
-                        <td>500</td>
-                    </tr>
-
-                    <tr>
-                        <td>Premium</td>
-                        <td>XXXX-XXXX-XXXX-2453</td>
-                        <td>1/23/2026</td>
-                        <td>12/23/2025</td>
-                        <td>Active</td>
-                        <td>Active</td>
-                        <td>500</td>
-                    </tr>
-
-                    <tr>
-                        <td>Premium</td>
-                        <td>XXXX-XXXX-XXXX-2453</td>
-                        <td>1/23/2026</td>
-                        <td>12/23/2025</td>
-                        <td>Active</td>
-                        <td>Active</td>
-                        <td>500</td>
-                    </tr>
-
-                    <tr>
-                        <td>Premium</td>
-                        <td>XXXX-XXXX-XXXX-2453</td>
-                        <td>1/23/2026</td>
-                        <td>12/23/2025</td>
-                        <td>Active</td>
-                        <td>Active</td>
-                        <td>500</td>
-                    </tr>
+                    @endif
                 </tbody>
             </table>
+
         </div>
     </div>
 
@@ -153,7 +105,7 @@ exit();
                     <input type="text" class="form-control d-inline-block w-auto" placeholder="Enter Coupon">
                 </div>
                 <div>
-                    <a href="#" class="btn btn-outline-success">
+                    <a href="{{ url('subscription') }}" class="btn btn-outline-success">
                         Buy More Credits
                     </a>
                     <span class="ms-2">Total Available Credits: <strong>456</strong></span>
@@ -165,7 +117,7 @@ exit();
 
 
 
-    <div class="tab-bg">
+    <div class="tab-bg my-4">
         <!-- My Blasts Section -->
         <h3>My Blasts</h3>
         <p>
@@ -177,84 +129,63 @@ exit();
 
         <!-- Blast Table -->
         <div class="table-responsive">
-    <table id="blastTable" class="dataTable table table-bordered text-center">
-        <thead class="table-light">
-            <tr>
-                <th>Blast Name</th>
-                <th>Recipients</th>
-                <th>Blasts</th>
-                <th>Completed</th>
-                <th>Start Date</th>
-                <th>End State</th>
-                <th>Cost</th>
-                <th>Success</th>
-                <th>Failed</th>
-                <th>Replies</th>
-                <th>Operation</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td class="text-success">Winter Rose Peeps</td>
-                <td class="text-success">1,203</td>
-                <td>10</td>
-                <td>2</td>
-                <td>12/14/2024</td>
-                <td>12/24/2024</td>
-                <td class="text-success">$255.00</td>
-                <td class="text-success">2,406</td>
-                <td>0</td>
-                <td>423</td>
-                <td>
-                    <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal" data-bs-target="#editModal">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
-                </td>
-            </tr>
-            <tr>
-                <td class="text-danger">Micheal Birthday Party</td>
-                <td class="text-danger">31,080</td>
-                <td>5</td>
-                <td>0</td>
-                <td>12/24/2024</td>
-                <td>12/24/2024</td>
-                <td class="text-danger">$435.00</td>
-                <td>0</td>
-                <td>0</td>
-                <td>0</td>
-                <td>
-                    <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal" data-bs-target="#editModal">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal" data-bs-target="#editModal">
-                        <i class="fa-solid fa-pencil"></i>
-                    </button>
-                </td>
-            </tr>
-            <tr>
-                <td>B Cole Comedy Show</td>
-                <td>400</td>
-                <td>2</td>
-                <td>2</td>
-                <td>11/14/2024</td>
-                <td>11/24/2024</td>
-                <td>$255.00</td>
-                <td>784</td>
-                <td>16</td>
-                <td>521</td>
-                <td>
-                    <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal" data-bs-target="#editModal">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+            <table class="dataTable table table-bordered" style="width:100%;">
+                <thead class="table-light">
+                    <tr>
+                        <th>Blast Name</th>
+                        <th>Recipients</th>
+                        <th>Blasts</th>
+                        <th>Completed</th>
+                        <th>Start Date</th>
+                        <th>End State</th>
+                        <th>Cost</th>
+                        <th>Success</th>
+                        <th>Failed</th>
+                        <th>Replies</th>
+                        <th>Operation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if(!empty($userBlastData) && count($userBlastData) > 0)
+                    @foreach($userBlastData as $invoice)
+                    <tr>
+                        <td>{{ $invoice->blast_name ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field2 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field3 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field4 ?? 'N/A' }}</td>
+                        <td>{{ \Carbon\Carbon::parse($invoice->created_at)->format('d/m/Y') ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field6 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field7 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->status ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field9 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field10 ?? 'N/A' }}</td>
+                        <td>{{ $invoice->field11 ?? 'N/A' }}</td>
+                    </tr>
+                    @endforeach
+                    @else
+                    <!-- Dummy row to prevent DataTables column mismatch -->
+                    <tr class="d-none">
+                        <td colspan="11"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="8" class="text-center">No Active Subscriptions available. Please purchase</td>
+                    </tr>
+                    @endif
+
+                </tbody>
+            </table>
+        </div>
 
     </div>
+  
+    @if(count($availableAnswere)>=1)
+    <div class="tab-bg my-4">
+        <a href="{{ url('download-replies') }}" class="btn btn-outline-primary"> 
+        <i class="fa-solid fa-file-csv"></i><span>Download Replies</span>
+        </a>
+    </div>
+    @endif
 </div>
-
 
 
 <!-- modal boxes -->
@@ -309,63 +240,70 @@ exit();
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
 <script>
-// for error and success message
-document.addEventListener('DOMContentLoaded', () => {
+    // for error and success message
+    document.addEventListener('DOMContentLoaded', () => {
 
-// Close the popups when clicking outside the box
-document.addEventListener('click', (event) => {
+        // Close the popups when clicking outside the box
+        document.addEventListener('click', (event) => {
 
-    // Error box logic
-    const errorOverlay = document.getElementById('errorOverlay');
-    if (errorOverlay && event.target.dataset.close === "true") {
-        closeErrorBox();
-    }
-
-    // Success box logic
-    const successOverlay = document.getElementById('successOverlay');
-    if (successOverlay && event.target.dataset.close === "true") {
-        closePopup();
-    }
-});
-});
-
-// Close error box
-function closeErrorBox() {
-const errorOverlay = document.getElementById('errorOverlay');
-if (errorOverlay) {
-    errorOverlay.style.display = 'none';
-}
-}
-
-// Close success popup
-function closePopup() {
-const successOverlay = document.getElementById('successOverlay');
-if (successOverlay) {
-    successOverlay.style.display = 'none';
-}
-}
-
-
-// for data tables
-
-$(document).ready(function() {
-        $('.dataTable').DataTable({
-        "paging": true,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "lengthMenu": [5, 10, 25, 50],
-        "pagingType": "simple_numbers",  // Only prev/next + numbers
-        "language": {
-            "search": "Search:",
-            "lengthMenu": "Show _MENU_ entries",
-            "paginate": {
-                "next": "<i class='fas fa-chevron-right'></i>",     // Next icon
-                "previous": "<i class='fas fa-chevron-left'></i>"   // Previous icon
+            // Error box logic
+            const errorOverlay = document.getElementById('errorOverlay');
+            if (errorOverlay && event.target.dataset.close === "true") {
+                closeErrorBox();
             }
-        }
+
+            // Success box logic
+            const successOverlay = document.getElementById('successOverlay');
+            if (successOverlay && event.target.dataset.close === "true") {
+                closePopup();
+            }
+        });
     });
-});
+
+    // Close error box
+    function closeErrorBox() {
+        const errorOverlay = document.getElementById('errorOverlay');
+        if (errorOverlay) {
+            errorOverlay.style.display = 'none';
+        }
+    }
+
+    // Close success popup
+    function closePopup() {
+        const successOverlay = document.getElementById('successOverlay');
+        if (successOverlay) {
+            successOverlay.style.display = 'none';
+        }
+    }
+
+
+    // for data tables
+    $.fn.dataTable.ext.errMode = 'none';
+    $(document).ready(function() {
+        $('.dataTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "lengthMenu": [5, 10, 25, 50],
+            "pagingType": "simple_numbers",
+            "language": {
+                "search": "", // Removes "Search:" label
+                "lengthMenu": "Show _MENU_ entries",
+                "paginate": {
+                    "next": "<i class='fas fa-chevron-right'></i>",
+                    "previous": "<i class='fas fa-chevron-left'></i>"
+                }
+            },
+            "initComplete": function() {
+                $('.dataTables_filter input[type="search"]')
+                    .attr('placeholder', 'Search here...')
+                    .css({
+                        'width': '200px'
+                    }); // optional: styling
+            }
+        });
+    });
 </script>
 
 

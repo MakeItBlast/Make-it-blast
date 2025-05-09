@@ -1,7 +1,9 @@
 @extends('admin.layout.app')
+
+@section('styles')
 <link rel="stylesheet" href="{{ asset('styles/payment-info.css') }}">
-<!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+@stop
+
 
 @section('content')
 @if ($errors->any())
@@ -48,6 +50,7 @@ exit();
         <h4 class="mt-2 mb-2">Payment Information</h4>
         <form method="POST" action="{{ url('add-card-detail') }}">
             @csrf <!-- CSRF Token for security -->
+            <input type="hidden" name="id" value="{{$cardDetailsUpd->id ?? ''}}">
             <div class="row">
                 <div class="col-md-6">
                     <input type="text" class="form-control" name="f_name"
@@ -110,8 +113,8 @@ exit();
     <div class="tab-bg mt-4">
         <h2 class="my-4">Saved Cards</h2>
         <div class="table-responsive">
-            <table id="myDataTable" class="table table-striped table-bordered">
-                <thead>
+            <table class="dataTable table table-bordered text-center">
+                <thead class="table-light">
                     <tr>
                         <th>First Name</th>
                         <th>Last Name</th>
@@ -119,34 +122,57 @@ exit();
                         <th>State</th>
                         <th>Credit Card Number</th>
                         <th>Expiration</th>
-                        <th>Active</th>
                         <th>Default</th>
                         <th>Operation</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($cardDetails as $card)
+                    @forelse($cardDetails as $card)
                     <tr>
                         <td>{{ $card->f_name }}</td>
                         <td>{{ $card->l_name }}</td>
                         <td>{{ $card->city }}</td>
                         <td>{{ $card->state }}</td>
-                        <td>XXXX-XXXX-XXXX-{{ substr($card->card_number, -4) }}</td> <!-- Masking CC -->
-                        <td>{{ \Carbon\Carbon::parse($card->exp_date)->format('m/y') }}</td> <!-- Formatting Expiry -->
-                        <td>{{ $card->active ? 'Yes' : 'No' }}</td>
-                        <td>{{ $card->is_default ? 'Yes' : 'No' }}</td>
+                        <td>XXXX-XXXX-XXXX-{{ substr($card->card_number, -4) }}</td>
+                        <td>{{ $card->exp_date }}</td>
+
+                        <!-- Toggle Switch -->
                         <td>
+                            <label class="switch" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Only one card can be set as default">
+                                <input type="checkbox" class="priority-toggle" data-id="{{ $card->id }}" {{ $card->priority == 1 ? 'checked' : '' }}>
+                                <span class="slider round"></span>
+                            </label>
+                        </td>
 
-                            <a class="edit-icon" href="{{url('update-card-info/'.$card->id)}}"> <i class="fa-solid fa-pencil"></i></a>
-
-                            <a href="#" class="delete-card-btn" data-url="{{ url('delete-card-info/'.$card->id) }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </a>
+                        <!-- Operation Buttons -->
+                        <td>
+                            <div class="action-btns">
+                                <a class="btn btn-sm edit-btn" href="{{url('update-card-info/'.$card->id)}}"> <i class="fa-solid fa-pencil"></i></a>
+                                <a href="#" class="btn btn-outline-primary btn-sm delete-btn" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <!-- Dummy row to prevent DataTables column mismatch -->
+                    <tr class="d-none">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="8" class="text-center">No Cards available</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
+
 
         </div>
     </div>
@@ -157,59 +183,62 @@ exit();
 
         <h5 class="mt-4">My Payment History</h5>
         <div class="table-responsive">
-            <table id="paymentTable" class="dataTable table table-bordered">
-                <thead>
+            <table class="dataTable table table-bordered text-center">
+                <thead class="table-light">
                     <tr>
                         <th>Invoice #</th>
-                        <th>Credit Card Number</th>
                         <th>Description of Service</th>
                         <th>Processed Date</th>
+                        <th>Status</th>
                         <th>Total</th>
                         <th>View</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>0909865</td>
-                        <td>XXXX-XXXX-XXXX-2453</td>
-                        <td>Premium Subscription</td>
-                        <td>1/23/2026</td>
-                        <td>$39.99</td>
-                        <td>
-                            <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal" data-bs-target="#editModal">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
-                        </td>
-                    </tr>
 
+                    @forelse ($invoice as $invoice)
+                    @php
+                    $description = json_decode($invoice->description, true);
+                    $name = $description[0]['name'] ?? 'N/A';
+                    @endphp
                     <tr>
-                        <td>0909866</td>
-                        <td>XXXX-XXXX-XXXX-1234</td>
-                        <td>Basic Subscription</td>
-                        <td>2/15/2026</td>
-                        <td>$19.99</td>
+                        <td>{{ $invoice->invoice_number }}</td>
+                        <td>{{ $name }}</td>
+                        <td>{{ \Carbon\Carbon::parse($invoice->created_at)->format('d/m/Y') }}</td>
+                        <td>Completed</td>
+                        <td>${{ number_format($invoice->total, 2) }}</td>
                         <td>
-                            <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal" data-bs-target="#editModal">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
+                            <div class="action-btns">
+                                <button
+                                    class="btn btn-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#invoiceModal"
+                                    data-invoice='@json($invoice)'
+                                    data-user_invoice='@json($user_invoice)'
+                                    data-user_invoice_meta='@json($user_invoice_meta)'>
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
-
-                    <tr>
-                        <td>0909867</td>
-                        <td>XXXX-XXXX-XXXX-5678</td>
-                        <td>Annual Subscription</td>
-                        <td>3/10/2026</td>
-                        <td>$99.99</td>
-                        <td>
-                            <button class="btn btn-outline-primary btn-sm rounded-circle" data-bs-toggle="modal" data-bs-target="#editModal">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
-                        </td>
+                    @empty
+                    <!-- Dummy row to prevent DataTables column mismatch -->
+                    <tr class="d-none">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
+                    <tr>
+                        <td colspan="6" class="text-center">No Invoices available</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
+
     </div>
 
 
@@ -235,25 +264,16 @@ exit();
 
 <!-- edit modal  -->
 
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+<!-- Invoice Preview Modal -->
+<div class="modal fade p-4" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content p-4">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Credit Card</h5>
+                <h5 class="modal-title" id="invoiceModalLabel">Invoice Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label">First Name</label>
-                        <input type="text" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Last Name</label>
-                        <input type="text" class="form-control">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </form>
+                <div id="invoiceContent"></div>
             </div>
         </div>
     </div>
@@ -264,7 +284,8 @@ exit();
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="" id="deleteCardForm">
+            @if(isset($card))
+            <form method="POST" action="{{ url('delete-card-info/'.$card->id) }}" id="deleteCardForm">
                 @csrf
                 @method('DELETE') <!-- This tells Laravel to treat it as a DELETE request -->
                 <div class="modal-header">
@@ -279,6 +300,7 @@ exit();
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </div>
             </form>
+            @endif
         </div>
     </div>
 </div>
@@ -300,26 +322,146 @@ exit();
         });
     });
 
-    // for data tables
 
-$(document).ready(function() {
-        $('.dataTable').DataTable({
-        "paging": true,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "lengthMenu": [5, 10, 25, 50],
-        "pagingType": "simple_numbers",  // Only prev/next + numbers
-        "language": {
-            "search": "Search:",
-            "lengthMenu": "Show _MENU_ entries",
-            "paginate": {
-                "next": "<i class='fas fa-chevron-right'></i>",     // Next icon
-                "previous": "<i class='fas fa-chevron-left'></i>"   // Previous icon
+    // for invoice preview
+    document.addEventListener('DOMContentLoaded', function() {
+        const invoiceModal = document.getElementById('invoiceModal');
+        const invoiceContent = document.getElementById('invoiceContent');
+
+        if (!invoiceModal || !invoiceContent) return;
+
+        invoiceModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+
+            try {
+                // Parse all invoice data
+                const invoice = JSON.parse(button.getAttribute('data-invoice'));
+                const userInvoice = JSON.parse(button.getAttribute('data-user_invoice'));
+                const userInvoiceMetaArray = JSON.parse(button.getAttribute('data-user_invoice_meta'));
+
+                // Extract the meta object from the array
+                const userInvoiceMeta = userInvoiceMetaArray[0] || {};
+
+                // Get service name from description
+                let serviceName = 'N/A';
+                try {
+                    const description = JSON.parse(invoice.description);
+                    serviceName = description[0]?.name || invoice.description || 'N/A';
+                } catch (e) {
+                    serviceName = invoice.description || 'N/A';
+                }
+
+                // Format invoice date
+                const formattedDate = new Date(invoice.created_at).toLocaleDateString('en-GB') || 'N/A';
+
+                // Extract company information
+                const companyName = (userInvoiceMeta.company_name || 'Customer Name').toString().trim();
+                const billingEmail = (userInvoiceMeta.billing_email || 'customer@example.com').toString().trim();
+
+                // Build the invoice HTML
+                invoiceContent.innerHTML = `
+            <div class="invoice-container" style="max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif;">
+                <div class="mb-4">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <h5><strong>Make It Blast</strong></h5>
+                                    <p class="mb-1">123 Business Street<br>City, State 10001</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <img src="{{ asset('media/Blast Logo.png') }}" alt="Company Logo" 
+                                 style="height: 150px;" onerror="this.style.display='none'">
+                        </div>
+                        <div class="col-4 text-end">
+                            <h6><strong>Invoice #${invoice.invoice_number || 'N/A'}</strong></h6>
+                            <p class="mb-1">Date: ${formattedDate}</p>
+                            <p>Status: <strong class="text-success">${invoice.status || 'Completed'}</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="border-top: 1px solid #ddd; margin: 20px 0;">
+
+                <div class="mb-4">
+                    <h4 style="margin-bottom: 10px; font-size: 1.1rem;"><strong>Billed To:</strong></h4>
+                    <p style="margin: 5px 0; font-size: 0.95rem;"><strong>${companyName}</strong></p>
+                    <p style="margin: 5px 0; font-size: 0.95rem;">${billingEmail}</p>
+                    <p style="margin: 5px 0; font-size: 0.95rem;">${userInvoiceMeta.address || ''}</p>
+                    <p style="margin: 5px 0; font-size: 0.95rem;">
+                        ${[userInvoiceMeta.city, userInvoiceMeta.state, userInvoiceMeta.zipcode].filter(Boolean).join(', ')}
+                    </p>
+                    <p style="margin: 5px 0; font-size: 0.95rem;">${userInvoiceMeta.country || ''}</p>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <thead>
+                        <tr style="background-color: #f8f9fa;">
+                            <th style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">Invoice #</th>
+                            <th style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">Description</th>
+                            <th style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">Date</th>
+                            <th style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">Status</th>
+                            <th style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">${invoice.invoice_number || 'N/A'}</td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">${serviceName}</td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">${formattedDate}</td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">${invoice.status || 'Completed'}</td>
+                            <td style="padding: 10px; border: 1px solid #dee2e6; text-align: center;">$${parseFloat(invoice.total || 0).toFixed(2)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="text-align: right; margin-top: 30px;">
+                    <h3>Thank you for your business!</h3>
+                    <p>This invoice was generated automatically.</p>
+                </div>
+            </div>`;
+
+            } catch (e) {
+                invoiceContent.innerHTML = `
+                <div class="alert alert-danger">
+                    <h4>Error Loading Invoice</h4>
+                    <p>Please try again or contact support</p>
+                </div>`;
             }
-        }
+        });
     });
-});
+
+
+    // for data Tables 
+    $.fn.dataTable.ext.errMode = 'none';
+    $(document).ready(function() {
+        $('.dataTable').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            lengthMenu: [5, 10, 25, 50],
+            pagingType: "simple_numbers",
+            language: {
+                search: "", // Removes "Search:" label
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    next: "<i class='fas fa-chevron-right'></i>",
+                    previous: "<i class='fas fa-chevron-left'></i>"
+                }
+            },
+            initComplete: function() {
+                $('.dataTables_filter input[type="search"]')
+                    .attr('placeholder', 'Search here...')
+                    .css('width', '200px'); // optional styling
+            },
+            drawCallback: function() {
+                $('.d-none').hide(); // Hide dummy rows
+            }
+        });
+    });
 
     // for synamically fetching contries state and city 
 
@@ -409,25 +551,42 @@ $(document).ready(function() {
         }
     }
 
+    // for switching card status 
 
-    // for card form validation
-    // document.addEventListener("DOMContentLoaded", () => {
-    //     const expDateInput = document.getElementById("exp_date");
+    document.querySelectorAll('.priority-toggle').forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                // Uncheck all other toggles
+                document.querySelectorAll('.priority-toggle').forEach(otherToggle => {
+                    if (otherToggle !== this) {
+                        otherToggle.checked = false;
+                    }
+                });
 
-    //     expDateInput.addEventListener("change", () => {
-    //         const selectedDate = expDateInput.value; // Format: YYYY-MM
-    //         if (selectedDate) {
-    //             const [year, month] = selectedDate.split("-");
-    //             expDateInput.type = "text"; // Switch to text type
-    //             expDateInput.value = `${month}/${year.slice(-2)}`; // Display as MM/YY
-    //         }
-    //     });
+                // Trigger the AJAX call
+                const cardId = this.dataset.id;
 
-    //     // Reset back to "month" input type on focus
-    //     expDateInput.addEventListener("focus", () => {
-    //         expDateInput.type = "month";
-    //     });
-    // });
+                $.ajax({
+                    url: '{{ url("/toggle-default-card") }}',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: {
+                        cardId: cardId
+                    },
+                    success: function(response) {
+                        alert('Priority updated successfully!');
+                        console.log(response);
+                    },
+                    error: function(xhr) {
+                        alert('Something went wrong!');
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+        });
+    });
 
 
     // for error and success message 
@@ -465,6 +624,14 @@ $(document).ready(function() {
             successOverlay.style.display = 'none';
         }
     }
+
+
+    // For tooltip 
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+
+    tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 </script>
 
 

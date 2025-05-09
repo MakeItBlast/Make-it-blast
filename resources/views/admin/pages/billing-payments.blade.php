@@ -1,5 +1,9 @@
 @extends('admin.layout.app')
+
+@section('styles')
 <link rel="stylesheet" href="{{ asset('styles/billing.css') }}">
+@stop
+
 
 @section('content')
 @if ($errors->any())

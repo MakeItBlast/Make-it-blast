@@ -151,61 +151,6 @@
             background: #2563eb;
         }
 
-        .for-pass {
-            text-decoration: none;
-            animation: moveUp 0.9s ease-in-out;
-        }
-
-        .rem-user {
-            justify-content: center;
-            display: flex;
-            gap: 15px;
-            animation: moveUp 0.9s ease-in-out;
-        }
-
-        .social-login {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        .social-login a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            border: 1px solid #ccc;
-            border-radius: 50%;
-            color: #333;
-            font-size: 20px;
-            transition: 0.3s;
-            text-decoration: none;
-        }
-
-
-        .social-login a:hover {
-            background: #f0f0f0;
-        }
-
-        .footer-text {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #666;
-            animation: fadeIn 1.2s ease-in-out;
-        }
-
-        .footer-text a {
-            color: #3b82f6;
-            text-decoration: none;
-        }
-
-        .footer-text a:hover {
-            text-decoration: underline;
-        }
 
         /* Animations */
         @keyframes fadeIn {

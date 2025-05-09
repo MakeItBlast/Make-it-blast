@@ -28,17 +28,18 @@
             height: 100vh;
         }
 
-        .back-log{
-        text-decoration: none;
-        background: #007bff;
-        border-radius: 25px;
-        color:#fff;
-        padding:5px 20px;
-    }
+        .back-log {
+            text-decoration: none;
+            background: #007bff;
+            border-radius: 25px;
+            color: #fff;
+            padding: 5px 20px;
+        }
 
-    .back-log:hover{
-        background: #0056b3;
-    }
+        .back-log:hover {
+            background: #0056b3;
+            color: #fff;
+        }
 
         /* Left Section */
         .left-section {
@@ -85,6 +86,41 @@
             animation: slideIn 0.8s ease-in-out;
         }
 
+        .form-group label {
+            display: block;
+            position: relative;
+        }
+
+        .form-group .form-control {
+            width: 100%;
+            height: 60px;
+            padding: 0 15px;
+            border-radius: 6px;
+            font-size: 18px;
+            background: transparent;
+            color: #000;
+        }
+
+        .floating-label {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #000;
+            font-size: 15px;
+            pointer-events: none;
+            transition: 0.3s ease;
+            background: #fff;
+            padding: 0 4px;
+            text-align: left;
+        }
+
+        .form-group.focused .floating-label {
+            top: 0;
+            font-size: 15px;
+            color: #000;
+        }
+
         .form-group input {
             width: 100%;
             padding: 12px 45px 12px 15px;
@@ -107,18 +143,6 @@
             color: #666;
         }
 
-        .form-group label{
-            text-align:left;
-        }
-
-        .toggle-password i {
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-        }
-
         .btn-primary {
             width: 100%;
             padding: 12px;
@@ -135,61 +159,7 @@
             background: #2563eb;
         }
 
-        .for-pass {
-            text-decoration: none;
-            animation: moveUp 0.9s ease-in-out;
-        }
 
-        .rem-user {
-            justify-content: center;
-            display: flex;
-            gap: 15px;
-            animation: moveUp 0.9s ease-in-out;
-        }
-
-        .social-login {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        .social-login a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            border: 1px solid #ccc;
-            border-radius: 50%;
-            color: #333;
-            font-size: 20px;
-            transition: 0.3s;
-            text-decoration: none;
-        }
-
-
-        .social-login a:hover {
-            background: #f0f0f0;
-        }
-
-        .footer-text {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #666;
-            animation: fadeIn 1.2s ease-in-out;
-        }
-
-        .footer-text a {
-            color: #3b82f6;
-            text-decoration: none;
-        }
-
-        .footer-text a:hover {
-            text-decoration: underline;
-        }
 
         /* Animations */
         @keyframes fadeIn {
@@ -313,6 +283,20 @@
             line-height: 1.6;
         }
 
+        /* Removing inc dec counter from input type number */
+
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
         /* Animation for smooth appearance */
         @keyframes jumpin {
             0% {
@@ -352,25 +336,65 @@
             <div class="form-container my-4">
                 <h1>Forgot your password?</h1>
                 <p>Reset it with one simple click</p>
-                <form class="log">
+                <form id="forgot-password-form" class="log main-form">
+                    @csrf
                     <div class="form-group">
                         <label>
-                            <span>Enter Email</span>
-                            <input type="email" placeholder="Enter your email" required>
+                            <span class="floating-label">Enter Email</span>
+                            <input type="email" class="form-control" name="forgot_email" id="forgot_email" required>
                         </label>
-
                     </div>
-                    <button class="btn mb-4 back-log">Request Password Reset Link</button>
+                    <button type="submit" class="btn btn-primary back-log" data-bs-toggle="modal" data-bs-target="#otpModal">
+                        Request Password Reset Link
+                    </button>
                 </form>
-
-                <a class="back-log my-4" href="{{ url('/') }}"> <i class="fa-solid fa-left-long"></i> Back to Log In</a>
+                <a class="btn btn-primary back-log my-4" href="{{ url('/') }}"> <i class="fa-solid fa-left-long"></i> Back to Log In</a>
             </div>
 
         </div>
-
         <!-- Right Section -->
         <div class="right-section"></div>
     </div>
+
+
+    <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="otpModalLabel">OTP Verification</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form method="post" action="{{ url('verify-OTP-From-User') }}" id="verify-otp-form">
+                        @csrf
+                        <div class="mb-3">
+                            <input type="number" class="form-control" name="otp" placeholder="OTP" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" class="form-control" name="user_email" id="modal_user_email" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" class="form-control" name="new_password" placeholder="New Password" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" class="form-control" name="new_password_confirmation" placeholder="Confirm Password" required>
+                        </div>
+                        <div class="text-end">
+                            <input type="submit" class="btn btn-success" value="Verify OTP">
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
         // Close the error box and remove the overlay
@@ -380,6 +404,75 @@
                 overlay.style.display = 'none';
             }
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('.form-group .form-control');
+
+            const updateInputState = (input) => {
+                const parent = input.closest('.form-group');
+                if (input.value.trim() !== "") {
+                    parent.classList.add('focused');
+                } else {
+                    parent.classList.remove('focused');
+                }
+            };
+
+            inputs.forEach(input => {
+                const parent = input.closest('.form-group');
+
+                // Run after DOM + potential server-side value rendering
+                setTimeout(() => updateInputState(input), 0);
+
+                input.addEventListener('input', () => updateInputState(input));
+                input.addEventListener('focus', () => parent.classList.add('focused'));
+                input.addEventListener('blur', () => updateInputState(input));
+            });
+        });
+
+        $(document).ready(function() {
+            $('#forgot-password-form').on('submit', function(e) {
+                e.preventDefault(); // Prevent form from submitting normally
+
+                let email = $('input[name="forgot_email"]').val(); // Get email value
+                let csrfToken = $('input[name="_token"]').val(); // Get CSRF token
+
+                $.ajax({
+                    url: '{{ url("send-otp") }}', // Or use route('send.otp') if you have a named route
+                    type: 'POST',
+                    data: {
+                        _token: csrfToken,
+                        forgot_email: email
+                    },
+                    success: function(response) {
+
+                        // Handle success (e.g., show success message)
+                        alert('OTP sent successfully!');
+
+                    },
+                    error: function(xhr) {
+
+
+
+                        // Handle error
+                        alert('Error sending OTP. Please try again.');
+                    }
+                });
+            });
+        });
+
+        document.getElementById('forgot-password-form').addEventListener('submit', function(e) {
+            e.preventDefault(); // prevent main form submission
+
+            // Get email value from main form
+            const email = document.getElementById('forgot_email').value;
+
+            // Set the value in the modal's email input
+            document.getElementById('modal_user_email').value = email;
+
+            // Show the modal
+            const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+            otpModal.show();
+        });
     </script>
 
 </body>

@@ -1,5 +1,10 @@
 @extends('admin.layout.app')
+
+@section('styles')
 <link rel="stylesheet" href="{{ asset('styles/service-payments.css') }}">
+@endsection
+
+
 
 @section('content')
 @if ($errors->any())
@@ -46,8 +51,8 @@ exit();
         <!-- Service Payments -->
         <h4>Invoice List</h4>
         <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead class="table-dark">
+            <table class="dataTable table table-bordered" style="width:100%;">
+                <thead class="table-light">
                     <tr>
                         <th>Invoice #</th>
                         <th>Invoice Date</th>
@@ -58,22 +63,22 @@ exit();
                     </tr>
                 </thead>
                 <tbody>
+                    @forelse($allPaymentData as $invdata)
+                   
                     <tr>
-                        <td>10203023</td>
-                        <td>12/14/2024</td>
-                        <td>Justus Church in Christ</td>
-                        <td>XXXX-XXXX-XXXX-3845</td>
-                        <td>12/15/2024 : 09:34 AM CST</td>
-                        <td>$49.99</td>
+                        <td>{{ $invdata-> invoice -> invoice_number ?? '' }}</td>
+                        <td>{{ $invdata->created_at }}</td>
+                        <td>{{ "{$invdata->user->name} {$invdata->user->last_name}" }}</td>
+                        <td>N/A</td>
+                        <td>{{$invdata->created_at}}</td>
+                        <td>{{$invdata->amount}}</td>
                     </tr>
+
+                    @empty
                     <tr>
-                        <td>10203023</td>
-                        <td>12/24/2024</td>
-                        <td>Justus Church in Christ</td>
-                        <td>XXXX-XXXX-XXXX-3845</td>
-                        <td>12/15/2024 : 09:34 AM CST</td>
-                        <td>$100.00</td>
+                        <td colspan="6" class="text-center">No contact types available.</td>
                     </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -98,7 +103,8 @@ exit();
 
             <div class="table-responsive mt-3">
                 <table class="table table-bordered">
-                    <thead class="table-dark">
+
+                    <thead class="table-light">
                         <tr>
                             <th>Service Name</th>
                             <th>Term</th>
@@ -186,6 +192,9 @@ exit();
 </div>
 
 
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
 <script>
     // for error and success message 
     document.addEventListener('DOMContentLoaded', () => {
@@ -222,6 +231,34 @@ exit();
             successOverlay.style.display = 'none';
         }
     }
+
+    // for dataTable
+    $.fn.dataTable.ext.errMode = 'none';
+    $(document).ready(function() {
+        $('.dataTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "lengthMenu": [5, 10, 25, 50],
+            "pagingType": "simple_numbers",
+            "language": {
+                "search": "", // Removes "Search:" label
+                "lengthMenu": "Show _MENU_ entries",
+                "paginate": {
+                    "next": "<i class='fas fa-chevron-right'></i>",
+                    "previous": "<i class='fas fa-chevron-left'></i>"
+                }
+            },
+            "initComplete": function() {
+                $('.dataTables_filter input[type="search"]')
+                    .attr('placeholder', 'Search here...')
+                    .css({
+                        'width': '200px'
+                    }); // optional: styling
+            }
+        });
+    });
 </script>
 
 @stop
