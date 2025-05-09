@@ -1,115 +1,136 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Service;
-use App\Models\SystemValue;
+use App\Models\Subscription;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use App\Models\SubscriptionConnUser;
+use App\Models\CardDetails;
 
-class ServiceController extends Controller
+class SubscriptionController extends Controller
 {
-    public function storeService(Request $request) {
-        try {
-            // Check if it's an update (id present) or create
-            $isUpdate = $request->has('id');
+
+
+    //get subscription
+    public function getSubscriptionData()
+        {
+    $subscriptions = Subscription::all(); 
+    $user = auth()->id();
+    $cardDetails = CardDetails::where('user_id', $user)->get();
+    $subscriptions = Subscription::where('status','active')->get();
     
-            // Validate incoming request data
-            $validator = Validator::make($request->all(), [
-                'service_name'      => 'required|string|max:255',
-                'service_desc'      => 'nullable|string|max:500',
-                'system_value_id'   => 'required|integer|exists:system_values,id',
-                'flat_rate'         => 'required|numeric|min:0',
+    // Get user's active subscriptions with their related subscription data
+    $userSubscriptions = SubscriptionConnUser::with(['subscription', 'payment'])
+        ->where('user_id', $user)
+        ->where('status', 'active')
+        ->get();
+
+    // return view('admin.pages.payment', [
+    //     'cardDetails' => $cardDetails,
+    //     'subscriptions' => $subscriptions,
+    //     'userSubscriptions' => $userSubscriptions
+    // ]);
+    
+    //$success_subscription = 
+
+    
+    return view('admin.pages.subscription', compact('subscriptions','cardDetails','userSubscriptions'));
+        }
+
+    //update subscrition
+    public function updateSubscriptionData(){
+
+    }
+
+   
+        public function subscriptionAddToList(Request $request)
+        {
+            // Validate subscription_id
+            $request->validate([
+                'subscription_id' => 'required|exists:subscriptions,id', // Ensure the subscription exists
             ]);
     
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
+            // Get the subscription from the database
+            $subscriptionId = $request->input('subscription_id');
+            $subscription = Subscription::find($subscriptionId);
+    
+            if (!$subscription) {
+                return response()->json(['success' => false, 'message' => 'Subscription not found!']);
             }
     
-            // Prepare data array
-            $serviceData = [
-                'service_name'     => $request->input('service_name'),
-                'service_desc'     => $request->input('service_desc'),
-                'system_value_id'  => $request->input('system_value_id'),
-                'flat_rate'        => $request->input('flat_rate'),
-            ];
+            // Option 1: Use Session (Add to session list)
+            $userList = session()->get('user_list', []);
+
+            // print_r($subscription);die;
     
-            if ($isUpdate) {
-                $service = Service::find($request->input('id'));
-                if (!$service) {
-                    return redirect()->back()->with('error', "Service not found");
-                }
-                $service->update($serviceData);
-                return redirect()->back()->with('success', "Service updated successfully");
-            } else {
-                $newService = Service::create($serviceData);
-                if ($newService) {
-                    return redirect()->back()->with('success', "New Service added successfully");
-                } else {
-                    return redirect()->back()->with('error', "Service not added");
-                }
+            // Avoid adding duplicate subscriptions
+            if (!in_array($subscriptionId, array_column($userList, 'id'))) {
+                $userList[] = $subscription;
+                session()->put('user_list', $userList);
             }
     
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
-        }
-    }
-
-    //get services 
-    public function getService(){
-
-        $getService = Service::all();
-        
-         
-         return view('admin.pages.profile', compact('getService'));
-    }
-
-    //store system values
-    public function storeSystemValue(Request $request){
-        try {
-            // Validate incoming request data
-            $validator = Validator::make($request->all(), [
-                'yearly_discount'    => 'required|numeric|between:0,100', // Ensures it is a numeric value between 0 and 100
-                'cost_per_blast'     => 'required|numeric|min:0', // Ensures it is a numeric value greater than or equal to 0
-                'dollar_value'       => 'required|numeric|min:0', // Ensures it is a numeric value greater than or equal to 0
+            // Option 2: Using Database (Optional, if you need persistent data)
+            // UserList::create([
+            //     'user_id' => auth()->id(),
+            //     'subscription_id' => $subscriptionId,
+            // ]);
+    
+            // Return response with the new item
+            return response()->json([
+                'success' => true,
+                'newItem' => $subscription,  // Send the new item data back to display
+                'message' => 'Item added to list successfully!'
             ]);
-            
-
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
-            }
-
-
-            // Construct an associative array for insertion
-            $newSystemValue = [
-                'yearly_discount' => $request->input('yearly_discount'),
-                'cost_per_blast' => $request->input('cost_per_blast'),
-              'dollar_value' => $request->input('dollar_value'),
-                
-            ];
-
-           
-            // Create a new record in the database
-            $addNewSystemValue = SystemValue::create($newSystemValue);
-
-            if($addNewSystemValue){
-                return redirect()->back()->with('success', "system value added Successcully");
-            }else{
-                return redirect()->back()->with('success', "system value not added");
-            }
-
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withErrors(['error' => 'Some critical Error: ' . $e->getMessage()])
-                ->withInput();
         }
-    }
 
-    public function getSystemValue(){
-        
-        $getSystemValues = SystemValue::all();
-        
-         
-         return view('admin.pages.profile', compact('getSystemValues'));
+       
+    //change the status of subscription
+public function updateSubscriptionStatus(Request $request)
+{
+    try {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|string|max:255',
+        ]);
+ 
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->first()
+            ]);
+        }
+ 
+        $upd = Subscription::find($request->id); // <-- Corrected line
+ 
+        if (!$upd) {
+            return response()->json([
+                'status' => 200,
+                'message' => 'id not found',
+            ]);
+        }
+ 
+        $newStatus = $upd->status === 'active' ? 'inactive' : 'active';
+ 
+        $chk = $upd->update(['status' => $newStatus]);
+ 
+        if ($chk) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Status updated to ' . $newStatus,
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update status.',
+            ]);
+        }
+ 
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Exception: ' . $e->getMessage()
+        ]);
     }
+}
+
     
 }
