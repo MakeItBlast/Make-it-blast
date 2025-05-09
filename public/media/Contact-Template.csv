@@ -1,10 +1,1 @@
-name,email,phone
-karun,bkad@kk.com,1234567890
-vimal,dfadnkj@koo.com,987654321
-shivan,fdshkj56656@gg.com,1234567891
-shivan,dfadf755@looks.com,1234567892
-shuraj,dfnakdjk@shiv.com,1234567893
-alok,dfajkdl@vip.com,1234567894
-anil,dfadnm4@next.com,1234567895
-amit,afd@yahooc.com,1234567896
-ashish,fad2@gmai.com,1234567897
+contact_type,c_fname,c_lname,c_city,c_state,c_timezone,c_phno,c_email

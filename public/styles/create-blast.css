@@ -1,3 +1,13 @@
+/* Make sure when modal is open, background content remains visible */
+body.modal-open > *:not(.modal):not(.modal-backdrop) {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#global-loader{
+    display:none !important;
+}
+
 .screen {
     display: none;
 }
@@ -23,9 +33,15 @@
     width:80% !important;
 }
 
-.b-cred{
-    height:fit-content;
+#b-m-credit{
+    height:fit-content !important;
 }
+
+.b-cred{
+    height:fit-content !important;
+}
+
+
 
 #summernote{
     width:100%;
@@ -57,6 +73,10 @@
 
 .add{
     width:100%;
+}
+
+.dataTables_empty{
+    display: none !important;
 }
 
 @keyframes fadeIn {
